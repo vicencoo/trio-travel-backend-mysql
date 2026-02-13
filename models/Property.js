@@ -13,7 +13,7 @@ const Property = sequelize.define(
     title: { type: Sequelize.STRING, allowNull: false },
     property_type: { type: Sequelize.STRING, allowNull: false },
     listing_type: { type: Sequelize.STRING, allowNull: false },
-    description: { type: Sequelize.STRING, allowNull: false },
+    description: { type: Sequelize.TEXT, allowNull: false },
     city: Sequelize.STRING,
     street: Sequelize.STRING,
     area: Sequelize.STRING,

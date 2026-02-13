@@ -1,5 +1,6 @@
 const { PlaneTicket, PlaneTicketImage } = require('../models');
 const clearImage = require('../utils/clearImage');
+const { Op } = require('sequelize');
 
 exports.addPlaneTicket = async (req, res) => {
   try {
@@ -32,9 +33,19 @@ exports.addPlaneTicket = async (req, res) => {
 
 exports.getTickets = async (req, res) => {
   try {
-    const { limit, page = 1 } = req.query;
+    const { limit, page = 1, searchQuery } = req.query;
     const DEFAULT_LIMIT = 20;
     const data = {};
+
+    let whereCondition = {};
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [
+          { to: { [Op.like]: `%${searchQuery}%` } },
+          { arrival_airport: { [Op.like]: `%${searchQuery}%` } },
+        ],
+      };
+    }
 
     const itemsPerPage = Math.min(
       Number(limit) || DEFAULT_LIMIT,
@@ -44,6 +55,7 @@ exports.getTickets = async (req, res) => {
 
     if (page) {
       data.tickets = await PlaneTicket.findAll({
+        where: whereCondition,
         limit: itemsPerPage,
         offset: skip,
         include: [

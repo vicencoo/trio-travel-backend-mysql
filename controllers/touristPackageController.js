@@ -1,5 +1,6 @@
 const { Package, PackageImage } = require('../models');
 const clearImage = require('../utils/clearImage');
+const { Op } = require('sequelize');
 
 exports.addPackage = async (req, res) => {
   try {
@@ -33,8 +34,22 @@ exports.addPackage = async (req, res) => {
 
 exports.getPackages = async (req, res) => {
   try {
-    const { packageLimit, page = 1 } = req.query;
+    const { packageLimit, page = 1, searchQuery } = req.query;
     const DEFAULT_LIMIT = 20;
+
+    console.log('Search query results: ', searchQuery);
+
+    let whereCondition = {};
+
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [
+          { title: { [Op.like]: `%${searchQuery}%` } },
+          { destination: { [Op.like]: `%${searchQuery}%` } },
+          { description: { [Op.like]: `%${searchQuery}%` } },
+        ],
+      };
+    }
 
     const itemsPerPage = Math.min(
       Number(packageLimit) || DEFAULT_LIMIT,
@@ -44,6 +59,7 @@ exports.getPackages = async (req, res) => {
 
     const { rows: packages, count: totalCount } = await Package.findAndCountAll(
       {
+        where: whereCondition,
         limit: itemsPerPage,
         offset: skip,
         include: [

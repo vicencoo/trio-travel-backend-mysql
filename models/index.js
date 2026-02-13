@@ -16,6 +16,12 @@ const Hotel = require('./Hotel');
 const HotelImage = require('./HotelImage');
 /** @type {import('sequelize').ModelStatic<any>} */
 const HotelFacility = require('./HotelFacility');
+/** @type {import('sequelize').ModelStatic<any>} */
+const Destination = require('./Destination');
+/** @type {import('sequelize').ModelStatic<any>} */
+const DestinationImage = require('./DestinationImage');
+/** @type {import('sequelize').ModelStatic<any>} */
+const DestinationType = require('./DestinationType');
 
 // Property <--> PropertyImage
 
@@ -58,6 +64,25 @@ Hotel.hasMany(HotelFacility, { foreignKey: 'hotel_id', as: 'facilities' });
 HotelImage.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 HotelFacility.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
 
+// Destination <--> DestinationImage <--> DestinationType
+Destination.hasMany(DestinationImage, {
+  foreignKey: 'destination_id',
+  as: 'destination_images',
+});
+Destination.hasMany(DestinationType, {
+  foreignKey: 'destination_id',
+  as: 'destination_types',
+});
+
+DestinationImage.belongsTo(Destination, {
+  foreignKey: 'destination_id',
+  as: 'destination',
+});
+DestinationType.belongsTo(Destination, {
+  foreignKey: 'destination_id',
+  as: 'destination',
+});
+
 module.exports = {
   Property,
   PropertyImage,
@@ -68,4 +93,7 @@ module.exports = {
   Hotel,
   HotelImage,
   HotelFacility,
+  Destination,
+  DestinationImage,
+  DestinationType,
 };

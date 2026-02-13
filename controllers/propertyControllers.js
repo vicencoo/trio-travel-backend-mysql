@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Property, PropertyImage } = require('../models');
 const clearImage = require('../utils/clearImage');
 
@@ -40,8 +41,30 @@ exports.addProperty = async (req, res) => {
 
 exports.getProperties = async (req, res) => {
   try {
-    const { limit, page = 1 } = req.query;
+    const { limit, page = 1, searchQuery, listingType } = req.query;
     const DEFAULT_LIMIT = 20;
+
+    console.log('Listing type :', listingType);
+
+    let whereCondition = {};
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [
+          { title: { [Op.like]: `%${searchQuery}%` } },
+          { description: { [Op.like]: `%${searchQuery}%` } },
+          { city: { [Op.like]: `%${searchQuery}%` } },
+          { street: { [Op.like]: `%${searchQuery}%` } },
+          { area: { [Op.like]: `%${searchQuery}%` } },
+        ],
+      };
+    }
+
+    if (listingType && listingType !== 'all') {
+      whereCondition = {
+        ...whereCondition,
+        listing_type: listingType,
+      };
+    }
 
     const itemsPerPage = Math.min(
       Number(limit) || DEFAULT_LIMIT,
@@ -51,6 +74,7 @@ exports.getProperties = async (req, res) => {
 
     const { rows: properties, count: totalProducts } =
       await Property.findAndCountAll({
+        where: whereCondition,
         limit: itemsPerPage,
         offset: skip,
         order: [['createdAt', 'DESC']],

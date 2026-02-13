@@ -91,6 +91,14 @@ const hotelValidationRules = () => {
   ];
 };
 
+const destinationValidateRules = () => {
+  return [
+    body('city').notEmpty().withMessage('Shkruani qytetin.'),
+    body('country').notEmpty().withMessage('Shkruani shtetin.'),
+    body('slogan').notEmpty().withMessage('Shkruani sloganin.'),
+  ];
+};
+
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -104,5 +112,6 @@ module.exports = {
   packageValidationRules,
   planeTicketValidationRules,
   hotelValidationRules,
+  destinationValidateRules,
   validate,
 };

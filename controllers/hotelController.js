@@ -43,11 +43,8 @@ exports.addHotel = async (req, res) => {
 exports.getHotels = async (req, res) => {
   try {
     const { limit, page = 1 } = req.query;
-    const DEFAULT_LIMIT = 20;
-    const itemsPerPage = Math.min(
-      Number(limit) || DEFAULT_LIMIT,
-      DEFAULT_LIMIT,
-    );
+    const HOTEL_LIMIT = 20;
+    const itemsPerPage = Math.min(Number(limit) || HOTEL_LIMIT, HOTEL_LIMIT);
     const skip = (page - 1) * itemsPerPage;
 
     const { rows: hotels, count: allHotels } = await Hotel.findAndCountAll({
@@ -71,8 +68,6 @@ exports.getHotels = async (req, res) => {
     const allPages = Math.ceil(allHotels / itemsPerPage);
     const pagination = { allHotels, allPages };
 
-    console.log(pagination);
-
     res.json({ hotels, pagination });
   } catch (err) {
     console.error('Getting hotels error', err);
@@ -84,23 +79,20 @@ exports.getOneHotel = async (req, res) => {
   try {
     const { hotelId } = req.query;
 
-    const hotel = await Hotel.findByPk(
-      { where: { id: hotelId } },
-      {
-        include: [
-          {
-            model: HotelImage,
-            as: 'hotel_images',
-            attributes: ['id', 'hotel_image'],
-          },
-          {
-            model: HotelFacility,
-            as: 'facilities',
-            attributes: ['id', 'facility'],
-          },
-        ],
-      },
-    );
+    const hotel = await Hotel.findByPk(hotelId, {
+      include: [
+        {
+          model: HotelImage,
+          as: 'hotel_images',
+          attributes: ['id', 'hotel_image'],
+        },
+        {
+          model: HotelFacility,
+          as: 'facilities',
+          attributes: ['id', 'facility'],
+        },
+      ],
+    });
 
     res.json(hotel);
   } catch (err) {
@@ -116,7 +108,7 @@ exports.editHotel = async (req, res) => {
     const deletedImgs = body.deletedImages
       ? JSON.parse(body.deletedImages)
       : [];
-    const newImagesFiles = req.query;
+    const newImagesFiles = req.files;
     const facilities = JSON.parse(body.facilities);
 
     const hotel = await Hotel.findByPk(hotelId);
