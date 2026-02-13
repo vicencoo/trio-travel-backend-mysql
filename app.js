@@ -1,4 +1,5 @@
 require('dotenv').config({ quiet: true });
+
 const express = require('express');
 const sequelize = require('./utils/database');
 const cors = require('cors');
@@ -19,16 +20,17 @@ app.use(propertyRoutes);
 app.use(planeTicketRoutes);
 app.use(packageRoutes);
 app.use(hotelRoutes);
-app.use(destinationRoutes)
+app.use(destinationRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
+const port = process.env.PORT || 8000;
 
 sequelize
   .sync()
   .then(() => {
-    console.log('Connected!');
-
-    app.listen(8001);
+    app.listen(port);
+    console.log(`Connected on  port ${port}!`);
   })
   .catch((err) => {
     console.error(err);
