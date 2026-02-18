@@ -17,7 +17,14 @@ router.post(
 
 router.get('/properties', propertyControllers.getProperties);
 
+router.post('/admin/renew-property', propertyControllers.renewProperty);
+
 router.get('/property', propertyControllers.getOneProperty);
+
+router.post(
+  '/admin/property/publishOrDraft',
+  propertyControllers.publishOrDraft,
+);
 
 router.post(
   '/admin/edit-property',

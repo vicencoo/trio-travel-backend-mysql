@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../utils/database');
+const sequelize = require('../config/database');
 const Package = require('./TouristPackage');
 
 const PackageImage = sequelize.define(

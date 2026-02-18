@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../utils/database');
+const sequelize = require('../config/database');
 
 const Property = sequelize.define(
   'Property',
@@ -23,6 +23,22 @@ const Property = sequelize.define(
     toilets: { type: Sequelize.DOUBLE, allowNull: true },
     floor_number: { type: Sequelize.DOUBLE, allowNull: true },
     build_year: { type: Sequelize.DOUBLE, allowNull: true },
+
+    // publishedAt: {
+    //   type: Sequelize.DATE,
+    //   allowNull: false,
+    //   defaultValue: Sequelize.NOW,
+    // },
+    publishedAt: {
+      type: Sequelize.DATE,
+      allowNull: true, // must be true
+    },
+
+    status: {
+      type: Sequelize.ENUM('draft', 'active'),
+      allowNull: false,
+      defaultValue: 'active',
+    },
   },
   {
     tableName: 'properties',

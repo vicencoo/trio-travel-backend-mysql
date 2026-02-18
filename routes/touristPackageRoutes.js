@@ -19,6 +19,8 @@ router.get('/packages', touristPackageController.getPackages);
 
 router.get('/package', touristPackageController.getPackage);
 
+router.post('/admin/renew-package', touristPackageController.renewPackage);
+
 router.post(
   '/admin/edit-package',
   upload.array('package_images'),

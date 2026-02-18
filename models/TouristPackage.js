@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../utils/database');
+const sequelize = require('../config/database');
 
 const Package = sequelize.define(
   'Package',
@@ -17,6 +17,17 @@ const Package = sequelize.define(
     description: { type: Sequelize.TEXT, allowNull: false },
     accomodation: { type: Sequelize.STRING, allowNull: false },
     meal_included: { type: Sequelize.STRING, allowNull: false },
+
+    publishedAt: {
+      type: Sequelize.DATE,
+      allowNull: true, // must be true
+    },
+
+    status: {
+      type: Sequelize.ENUM('draft', 'active'),
+      allowNull: false,
+      defaultValue: 'draft',
+    },
   },
   {
     tableName: 'packages',

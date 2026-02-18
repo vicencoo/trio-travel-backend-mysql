@@ -15,6 +15,8 @@ exports.addPackage = async (req, res) => {
       description: body.description,
       accomodation: body.accomodation,
       meal_included: body.meal_included,
+      status: body.status,
+      publishedAt: body.status === 'active' ? new Date() : null,
     });
 
     if (packageImageFiles.length) {
@@ -36,8 +38,6 @@ exports.getPackages = async (req, res) => {
   try {
     const { packageLimit, page = 1, searchQuery } = req.query;
     const DEFAULT_LIMIT = 20;
-
-    console.log('Search query results: ', searchQuery);
 
     let whereCondition = {};
 
@@ -70,7 +70,7 @@ exports.getPackages = async (req, res) => {
           },
         ],
         distinct: true,
-        order: [['createdAt', 'DESC']],
+        order: [['publishedAt', 'DESC']],
       },
     );
     const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -105,6 +105,25 @@ exports.getPackage = async (req, res) => {
   }
 };
 
+exports.renewPackage = async (req, res) => {
+  try {
+    const { packageId } = req.query;
+
+    const package = await Package.findByPk(packageId);
+
+    if (!package) {
+      return res.status(404).json({ message: 'Package not found' });
+    }
+
+    await package.update({ publishedAt: new Date() });
+
+    res.json({ message: 'Package renewed' });
+  } catch (err) {
+    console.error('Renew package error', err);
+    res.status(400).json({ message: 'Error while renewing package' });
+  }
+};
+
 exports.editPackage = async (req, res) => {
   try {
     const { packageId } = req.query;
@@ -127,6 +146,8 @@ exports.editPackage = async (req, res) => {
       description: body.description,
       accomodation: body.accomodation,
       meal_included: body.meal_included,
+      status: body.status,
+      publishedAt: body.status === 'active' ? package.createdAt : null,
     });
 
     if (deletedImgs.length) {

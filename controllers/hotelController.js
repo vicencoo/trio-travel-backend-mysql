@@ -1,4 +1,3 @@
-const { where } = require('sequelize');
 const { Hotel, HotelFacility, HotelImage } = require('../models');
 const clearImage = require('../utils/clearImage');
 

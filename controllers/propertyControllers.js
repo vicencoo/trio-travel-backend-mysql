@@ -21,6 +21,8 @@ exports.addProperty = async (req, res) => {
       toilets: body.toilets ? Number(body.toilets) : null,
       floor_number: body.floor_number ? Number(body.floor_number) : null,
       build_year: body.build_year ? Number(body.build_year) : null,
+      status: body.status,
+      publishedAt: body.status === 'active' ? new Date() : null,
     });
 
     if (propertyImageFiles.length > 0) {
@@ -41,10 +43,14 @@ exports.addProperty = async (req, res) => {
 
 exports.getProperties = async (req, res) => {
   try {
-    const { limit, page = 1, searchQuery, listingType } = req.query;
+    const {
+      limit,
+      page = 1,
+      searchQuery,
+      listingType,
+      status = 'active',
+    } = req.query;
     const DEFAULT_LIMIT = 20;
-
-    console.log('Listing type :', listingType);
 
     let whereCondition = {};
     if (searchQuery) {
@@ -66,6 +72,13 @@ exports.getProperties = async (req, res) => {
       };
     }
 
+    if (status && status !== 'all') {
+      whereCondition = {
+        ...whereCondition,
+        status: status,
+      };
+    }
+
     const itemsPerPage = Math.min(
       Number(limit) || DEFAULT_LIMIT,
       DEFAULT_LIMIT,
@@ -77,7 +90,7 @@ exports.getProperties = async (req, res) => {
         where: whereCondition,
         limit: itemsPerPage,
         offset: skip,
-        order: [['createdAt', 'DESC']],
+        order: [['publishedAt', 'DESC']],
         include: [
           {
             model: PropertyImage,
@@ -97,6 +110,24 @@ exports.getProperties = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.renewProperty = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const property = await Property.findByPk(id);
+
+    if (!property)
+      return res.status(404).json({ message: 'Property not found!' });
+
+    await property.update({ publishedAt: new Date() });
+
+    res.json({ message: 'Property Renewed.' });
+  } catch (err) {
+    console.error('Renew property error', err);
+    res.status(400).json({ message: 'Error while renewing a property' });
   }
 };
 
@@ -122,6 +153,36 @@ exports.getOneProperty = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error while getting selected property' });
+  }
+};
+
+exports.publishOrDraft = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const property = await Property.findByPk(id);
+    if (!property) res.status(404).json({ message: 'Property not found!' });
+    let newStatus = '';
+    if (property.status === 'active') {
+      newStatus = 'draft';
+      property.publishedAt = null;
+    } else if (property.status === 'draft') {
+      newStatus = 'active';
+      property.publishedAt = new Date();
+    } else {
+      return res.status(400).json({ message: 'Invalid property status' });
+    }
+
+    property.status = newStatus;
+    await property.save();
+
+    res
+      .status(200)
+      .json({ message: `Property status updated to ${newStatus}` });
+  } catch (err) {
+    console.error('Publish Draft error', err);
+    res.status(400).json({
+      message: 'Something went wrong while drafting or publishing a property',
+    });
   }
 };
 
@@ -155,6 +216,8 @@ exports.editProperty = async (req, res) => {
       toilets: body.toilets ? Number(body.toilets) : null,
       floor_number: body.floor_number ? Number(body.floor_number) : null,
       build_year: body.build_year ? Number(body.build_year) : null,
+      status: body.status,
+      publishedAt: body.status === 'draft' ? null : property.publishedAt,
     });
 
     if (deletedImgs.length) {

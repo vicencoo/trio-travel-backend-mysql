@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../utils/database');
+const sequelize = require('../config/database');
 const Property = require('./Property');
 
 const PropertyImage = sequelize.define(
