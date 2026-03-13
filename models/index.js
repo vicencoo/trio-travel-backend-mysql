@@ -11,17 +11,15 @@ const Package = require('./TouristPackage');
 /** @type {import('sequelize').ModelStatic<any>} */
 const PackageImage = require('./TouristPackageImage');
 /** @type {import('sequelize').ModelStatic<any>} */
-const Hotel = require('./Hotel');
-/** @type {import('sequelize').ModelStatic<any>} */
-const HotelImage = require('./HotelImage');
-/** @type {import('sequelize').ModelStatic<any>} */
-const HotelFacility = require('./HotelFacility');
-/** @type {import('sequelize').ModelStatic<any>} */
 const Destination = require('./Destination');
 /** @type {import('sequelize').ModelStatic<any>} */
 const DestinationImage = require('./DestinationImage');
 /** @type {import('sequelize').ModelStatic<any>} */
 const DestinationType = require('./DestinationType');
+/** @type {import('sequelize').ModelStatic<any>} */
+const User = require('./User');
+/** @type {import('sequelize').ModelStatic<any>} */
+const RefreshToken = require('./RefreshToken');
 
 // Property <--> PropertyImage
 
@@ -57,13 +55,6 @@ PackageImage.belongsTo(Package, {
   as: 'package',
 });
 
-// Hotel <--> HotelImage <--> HotelFacility
-Hotel.hasMany(HotelImage, { foreignKey: 'hotel_id', as: 'hotel_images' });
-Hotel.hasMany(HotelFacility, { foreignKey: 'hotel_id', as: 'facilities' });
-
-HotelImage.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
-HotelFacility.belongsTo(Hotel, { foreignKey: 'hotel_id', as: 'hotel' });
-
 // Destination <--> DestinationImage <--> DestinationType
 Destination.hasMany(DestinationImage, {
   foreignKey: 'destination_id',
@@ -83,6 +74,17 @@ DestinationType.belongsTo(Destination, {
   as: 'destination',
 });
 
+// User <--> Refresh Token
+User.hasMany(RefreshToken, {
+  foreignKey: 'user_id',
+  as: 'refresh_tokens',
+});
+
+RefreshToken.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user',
+});
+
 module.exports = {
   Property,
   PropertyImage,
@@ -90,10 +92,9 @@ module.exports = {
   PlaneTicketImage,
   Package,
   PackageImage,
-  Hotel,
-  HotelImage,
-  HotelFacility,
   Destination,
   DestinationImage,
   DestinationType,
+  User,
+  RefreshToken,
 };

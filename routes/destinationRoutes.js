@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/multer');
-const destinationController = require('../controllers/destinationControllers');
+const destinationController = require('../controllers/destinationController');
 const {
   destinationValidateRules,
   validate,
 } = require('../middleware/validators');
+const { protect } = require('../middleware/auth');
 
 router.post(
   '/admin/add-destination',
   upload.array('destination_images'),
+  protect(['admin']),
   destinationValidateRules(),
   validate,
   destinationController.addDestination,
@@ -20,6 +22,7 @@ router.get('/destinations', destinationController.getDestinations);
 router.post(
   '/admin/edit-destination',
   upload.array('destination_images'),
+  protect(['admin']),
   destinationValidateRules(),
   validate,
   destinationController.editDestination,
@@ -27,6 +30,7 @@ router.post(
 
 router.post(
   '/admin/delete-destination',
+  protect(['admin']),
   destinationController.deleteDestination,
 );
 

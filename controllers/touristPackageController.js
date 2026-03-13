@@ -36,7 +36,12 @@ exports.addPackage = async (req, res) => {
 
 exports.getPackages = async (req, res) => {
   try {
-    const { packageLimit, page = 1, searchQuery } = req.query;
+    const {
+      packageLimit,
+      page = 1,
+      searchQuery,
+      status = 'active',
+    } = req.query;
     const DEFAULT_LIMIT = 20;
 
     let whereCondition = {};
@@ -48,6 +53,13 @@ exports.getPackages = async (req, res) => {
           { destination: { [Op.like]: `%${searchQuery}%` } },
           { description: { [Op.like]: `%${searchQuery}%` } },
         ],
+      };
+    }
+
+    if (status && status !== 'all') {
+      whereCondition = {
+        ...whereCondition,
+        status: status,
       };
     }
 
@@ -115,12 +127,47 @@ exports.renewPackage = async (req, res) => {
       return res.status(404).json({ message: 'Package not found' });
     }
 
+    if (package.status === 'draft') return;
+
     await package.update({ publishedAt: new Date() });
 
     res.json({ message: 'Package renewed' });
   } catch (err) {
     console.error('Renew package error', err);
     res.status(400).json({ message: 'Error while renewing package' });
+  }
+};
+
+exports.publishOrDraftPackage = async (req, res) => {
+  try {
+    const { packageId } = req.query;
+
+    const package = await Package.findByPk(packageId);
+
+    if (!package) {
+      return res.status(404).json({ message: 'This package is not found.' });
+    }
+
+    let newStatus = '';
+    if (package.status === 'active') {
+      newStatus = 'draft';
+      package.publishedAt = null;
+    } else if (package.status === 'draft') {
+      newStatus = 'active';
+      package.publishedAt = new Date();
+    } else {
+      return res.status(400).json({ message: 'Invalid package status' });
+    }
+
+    package.status = newStatus;
+    await package.save();
+
+    res.json({ message: 'Package status updated' });
+  } catch (err) {
+    console.error('Publish or draft package error', err);
+    res
+      .status(400)
+      .json({ message: 'Error while publishing or drafting a package' });
   }
 };
 
@@ -147,7 +194,7 @@ exports.editPackage = async (req, res) => {
       accomodation: body.accomodation,
       meal_included: body.meal_included,
       status: body.status,
-      publishedAt: body.status === 'active' ? package.createdAt : null,
+      publishedAt: body.status === 'draft' ? null : package.createdAt,
     });
 
     if (deletedImgs.length) {

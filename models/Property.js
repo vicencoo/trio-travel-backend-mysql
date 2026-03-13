@@ -24,14 +24,9 @@ const Property = sequelize.define(
     floor_number: { type: Sequelize.DOUBLE, allowNull: true },
     build_year: { type: Sequelize.DOUBLE, allowNull: true },
 
-    // publishedAt: {
-    //   type: Sequelize.DATE,
-    //   allowNull: false,
-    //   defaultValue: Sequelize.NOW,
-    // },
     publishedAt: {
       type: Sequelize.DATE,
-      allowNull: true, // must be true
+      allowNull: true,
     },
 
     status: {

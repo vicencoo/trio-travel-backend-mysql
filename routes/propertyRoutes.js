@@ -6,10 +6,12 @@ const {
   propertyValidationRules,
   validate,
 } = require('../middleware/validators');
+const { protect } = require('../middleware/auth');
 
 router.post(
   '/admin/add-property',
   upload.array('property_images'),
+  protect(['admin']),
   propertyValidationRules(),
   validate,
   propertyControllers.addProperty,
@@ -17,23 +19,33 @@ router.post(
 
 router.get('/properties', propertyControllers.getProperties);
 
-router.post('/admin/renew-property', propertyControllers.renewProperty);
+router.get('/property', propertyControllers.getProperty);
 
-router.get('/property', propertyControllers.getOneProperty);
+router.post(
+  '/admin/renew-property',
+  protect(['admin']),
+  propertyControllers.renewProperty,
+);
 
 router.post(
   '/admin/property/publishOrDraft',
+  protect(['admin']),
   propertyControllers.publishOrDraft,
 );
 
 router.post(
   '/admin/edit-property',
   upload.array('property_images'),
+  protect(['admin']),
   propertyValidationRules(),
   validate,
   propertyControllers.editProperty,
 );
 
-router.post('/admin/delete-property', propertyControllers.deleteProperty);
+router.post(
+  '/admin/delete-property',
+  protect(['admin']),
+  propertyControllers.deleteProperty,
+);
 
 module.exports = router;

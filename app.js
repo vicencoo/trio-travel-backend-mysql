@@ -5,22 +5,36 @@ const sequelize = require('./config/database');
 const cors = require('cors');
 const path = require('path');
 const app = express();
+const cookieParser = require('cookie-parser');
 
 const propertyRoutes = require('./routes/propertyRoutes');
 const planeTicketRoutes = require('./routes/planeTicketRoutes');
 const packageRoutes = require('./routes/touristPackageRoutes');
-const hotelRoutes = require('./routes/hotelRoutes');
 const destinationRoutes = require('./routes/destinationRoutes');
+const authRoutes = require('./routes/authRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const insuranceRoutes = require('./routes/insuranceRoutes');
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    // origin: process.env.REQUEST_ORIGIN,
+    origin: process.env.REQUEST_ORIGIN_NETWORK,
+    credentials: true,
+  }),
+);
 
 app.use(propertyRoutes);
 app.use(planeTicketRoutes);
 app.use(packageRoutes);
-app.use(hotelRoutes);
 app.use(destinationRoutes);
+app.use(authRoutes);
+app.use(bookingRoutes);
+app.use(dashboardRoutes);
+app.use(insuranceRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

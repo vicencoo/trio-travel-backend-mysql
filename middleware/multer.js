@@ -10,7 +10,6 @@ const imageStorage = multer.diskStorage({
       if (file.fieldname === 'property_images') imageFolder = 'property_images';
       if (file.fieldname === 'ticket_images') imageFolder = 'ticket_images';
       if (file.fieldname === 'package_images') imageFolder = 'package_images';
-      if (file.fieldname === 'hotel_images') imageFolder = 'hotel_images';
       if (file.fieldname === 'destination_images')
         imageFolder = 'destination_images';
 

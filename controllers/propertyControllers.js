@@ -113,26 +113,10 @@ exports.getProperties = async (req, res) => {
   }
 };
 
-exports.renewProperty = async (req, res) => {
+exports.getProperty = async (req, res) => {
   try {
-    const { id } = req.query;
+    console.log('REQUEST IS HERE');
 
-    const property = await Property.findByPk(id);
-
-    if (!property)
-      return res.status(404).json({ message: 'Property not found!' });
-
-    await property.update({ publishedAt: new Date() });
-
-    res.json({ message: 'Property Renewed.' });
-  } catch (err) {
-    console.error('Renew property error', err);
-    res.status(400).json({ message: 'Error while renewing a property' });
-  }
-};
-
-exports.getOneProperty = async (req, res) => {
-  try {
     const { id } = req.query;
 
     const property = await Property.findByPk(id, {
@@ -148,7 +132,6 @@ exports.getOneProperty = async (req, res) => {
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
     }
-
     res.json(property);
   } catch (err) {
     console.error(err);
@@ -156,11 +139,34 @@ exports.getOneProperty = async (req, res) => {
   }
 };
 
+exports.renewProperty = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const property = await Property.findByPk(id);
+
+    if (!property)
+      return res.status(404).json({ message: 'Property not found!' });
+
+    if (property.status === 'draft') return;
+
+    await property.update({ publishedAt: new Date() });
+
+    res.json({ message: 'Property Renewed.' });
+  } catch (err) {
+    console.error('Renew property error', err);
+    res.status(400).json({ message: 'Error while renewing a property' });
+  }
+};
+
 exports.publishOrDraft = async (req, res) => {
   try {
     const { id } = req.query;
+
     const property = await Property.findByPk(id);
+
     if (!property) res.status(404).json({ message: 'Property not found!' });
+
     let newStatus = '';
     if (property.status === 'active') {
       newStatus = 'draft';

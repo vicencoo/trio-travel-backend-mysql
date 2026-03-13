@@ -61,41 +61,63 @@ const planeTicketValidationRules = () => {
   ];
 };
 
-const hotelValidationRules = () => {
-  return [
-    body('hotel_name').notEmpty().withMessage('Plotëso emrin e hotelit.'),
-
-    body('location').notEmpty().withMessage('Lokacioni duhet të plotësohet.'),
-
-    body('description').notEmpty().withMessage('Plotëso emrin e hotelit.'),
-
-    body('rating')
-      .notEmpty()
-      .withMessage('Vlerësimi i hotelit duhet të plotësohet.')
-      .isFloat({ min: 0, max: 5 })
-      .withMessage('Vlerësimi duhet të jetë një numër midis 0 dhe 5.'),
-
-    body('reviews')
-      .notEmpty()
-      .withMessage('Numri i komenteve duhet të plotësohet.')
-      .isInt({ min: 0 })
-      .withMessage(
-        'Numri i komenteve duhet të jetë një numër i plotë pozitiv.',
-      ),
-
-    body('price')
-      .notEmpty()
-      .withMessage('Çmimi duhet të plotësohet.')
-      .isFloat({ min: 0 })
-      .withMessage('Çmimi duhet të jetë një numër pozitiv.'),
-  ];
-};
-
 const destinationValidateRules = () => {
   return [
     body('city').notEmpty().withMessage('Shkruani qytetin.'),
     body('country').notEmpty().withMessage('Shkruani shtetin.'),
     body('slogan').notEmpty().withMessage('Shkruani sloganin.'),
+  ];
+};
+
+const bookingValidationRules = () => {
+  return [
+    body('client_name')
+      .notEmpty()
+      .withMessage('Ju lutem shkruani emrin e klinetit'),
+
+    body('ticket_code').notEmpty().withMessage('Shkruani kodin e biletës'),
+
+    body('ticket_date')
+      .notEmpty()
+      .withMessage('Zgjidhni datën që do të beni check in të biletës'),
+
+    body('ticket_price').notEmpty().withMessage('Vendosni cmimin e biletës'),
+  ];
+};
+
+const loginValidationRules = () => {
+  return [
+    body('email')
+      .isEmail()
+      .withMessage('Ju lutemi shkruani një email të vlefshëm.'),
+
+    body('password').notEmpty().withMessage('Ju lutemi shkruani fjalëkalimin.'),
+  ];
+};
+
+const signupValidationRules = () => {
+  return [
+    body('email')
+      .isEmail()
+      .withMessage('Ju lutemi shkruani një email të vlefshëm.'),
+    body('username')
+      .notEmpty()
+      .withMessage('Ju lutemi shkruani një emër përdoruesi.'),
+    body('password')
+      .isLength({ min: 7 })
+      .withMessage('Fjalëkalimi duhet të jetë të paktën 7 karaktere.'),
+  ];
+};
+
+const insuranceValidationRules = () => {
+  return [
+    body('client_name').notEmpty().withMessage('Vendosni emrin e klientit.'),
+    body('contact_number')
+      .notEmpty()
+      .withMessage('Vendosni një numër telefoni.')
+      .isMobilePhone()
+      .withMessage('Vendosni një numër të vlefshëm.'),
+    body('car_plate').notEmpty().withMessage('Vendosni një targë makine.'),
   ];
 };
 
@@ -111,7 +133,10 @@ module.exports = {
   propertyValidationRules,
   packageValidationRules,
   planeTicketValidationRules,
-  hotelValidationRules,
   destinationValidateRules,
+  bookingValidationRules,
+  loginValidationRules,
+  signupValidationRules,
+  insuranceValidationRules,
   validate,
 };

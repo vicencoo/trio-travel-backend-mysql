@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../config/database');
-const Hotel = require('./Hotel');
+const User = require('./User');
 
-const HotelFacility = sequelize.define(
-  'HotelFacility',
+const RefreshToken = sequelize.define(
+  'RefreshToken',
   {
     id: {
       type: Sequelize.INTEGER,
@@ -11,22 +11,26 @@ const HotelFacility = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    facility: { type: Sequelize.STRING },
-    hotel_id: {
+    user_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: Hotel,
+        model: User,
         key: 'id',
       },
       onDelete: 'CASCADE',
     },
+    token: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+    },
+    expires_at: { type: Sequelize.DATE, allowNull: false },
   },
   {
-    tableName: 'hotel_facilities',
+    tableName: 'refresh_tokens',
     underscored: true,
     timestamps: true,
   },
 );
 
-module.exports = HotelFacility;
+module.exports = RefreshToken;
