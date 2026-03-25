@@ -23,8 +23,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    // origin: process.env.REQUEST_ORIGIN,
-    origin: process.env.REQUEST_ORIGIN_NETWORK,
+    origin: process.env.REQUEST_ORIGIN,
+    // origin: process.env.REQUEST_ORIGIN_NETWORK,
     credentials: true,
   }),
 );
