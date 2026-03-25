@@ -240,7 +240,7 @@ exports.deletePackage = async (req, res) => {
 
     package.package_images.forEach((p) => clearImage(p.image));
 
-    await PackageImage.destroy({ where: { packageId } });
+    await PackageImage.destroy({ where: { package_id: packageId } });
 
     await Package.destroy({ where: { id: packageId } });
 

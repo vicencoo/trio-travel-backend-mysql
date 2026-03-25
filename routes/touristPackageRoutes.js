@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const touristPackageController = require('../controllers/touristPackageController');
-const upload = require('../middleware/multer');
+const { upload, processImages } = require('../middleware/multer');
 const {
   packageValidationRules,
   validate,
@@ -11,6 +11,7 @@ const { protect } = require('../middleware/auth');
 router.post(
   '/admin/add-package',
   upload.array('package_images'),
+  processImages,
   protect(['admin']),
   packageValidationRules(),
   validate,
@@ -36,6 +37,7 @@ router.post(
 router.post(
   '/admin/edit-package',
   upload.array('package_images'),
+  processImages,
   protect(['admin']),
   packageValidationRules(),
   validate,

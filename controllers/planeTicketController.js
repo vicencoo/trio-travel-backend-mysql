@@ -102,7 +102,6 @@ exports.getTickets = async (req, res) => {
 exports.editTicket = async (req, res) => {
   try {
     const { body } = req;
-
     const { ticketId } = req.query;
     const ticketImageFiles = req.files;
 
@@ -144,6 +143,8 @@ exports.deleteTicket = async (req, res) => {
   try {
     const { ticketId } = req.query;
 
+    console.log('ticketId', ticketId);
+
     const planeTicket = await PlaneTicket.findByPk(ticketId, {
       include: [{ model: PlaneTicketImage, as: 'ticket_images' }],
     });
@@ -155,7 +156,7 @@ exports.deleteTicket = async (req, res) => {
       clearImage(img.image);
     });
 
-    await PlaneTicketImage.destroy({ where: { ticketId } });
+    await PlaneTicketImage.destroy({ where: { ticket_id: ticketId } });
     await PlaneTicket.destroy({ where: { id: ticketId } });
 
     res.json({ message: 'Plane ticket deleted' });

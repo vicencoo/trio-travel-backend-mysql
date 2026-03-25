@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const propertyControllers = require('../controllers/propertyControllers');
-const upload = require('../middleware/multer');
+const { upload, processImages } = require('../middleware/multer');
 const {
   propertyValidationRules,
   validate,
@@ -11,6 +11,7 @@ const { protect } = require('../middleware/auth');
 router.post(
   '/admin/add-property',
   upload.array('property_images'),
+  processImages,
   protect(['admin']),
   propertyValidationRules(),
   validate,
@@ -36,6 +37,7 @@ router.post(
 router.post(
   '/admin/edit-property',
   upload.array('property_images'),
+  processImages,
   protect(['admin']),
   propertyValidationRules(),
   validate,

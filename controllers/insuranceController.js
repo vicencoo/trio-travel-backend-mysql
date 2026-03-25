@@ -23,14 +23,25 @@ exports.createInsurance = async (req, res) => {
 
 exports.getInsurances = async (req, res) => {
   try {
-    const { limit, page = 1 } = req.query;
+    const { limit, page = 1, searchQuery } = req.query;
+    let whereCondition = {};
 
     const itemsPerPage = Number(limit) || 1;
     const skip = (page - 1) * itemsPerPage;
 
+    if (searchQuery) {
+      whereCondition = {
+        [Op.or]: [
+          { client_name: { [Op.like]: `%${searchQuery}%` } },
+          { car_plate: { [Op.like]: `%${searchQuery}%` } },
+        ],
+      };
+    }
+
     const { count, rows } = await Insurance.findAndCountAll({
       limit: itemsPerPage,
       offset: skip,
+      where: whereCondition,
       order: [['createdAt', 'DESC']],
     });
 

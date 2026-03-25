@@ -34,6 +34,11 @@ const Property = sequelize.define(
       allowNull: false,
       defaultValue: 'active',
     },
+    availability: {
+      type: Sequelize.ENUM('available', 'sold', 'rented'),
+      allowNull: false,
+      defaultValue: 'available',
+    },
   },
   {
     tableName: 'properties',

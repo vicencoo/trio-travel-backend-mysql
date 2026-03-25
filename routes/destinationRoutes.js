@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/multer');
+const { upload, processImages } = require('../middleware/multer');
 const destinationController = require('../controllers/destinationController');
 const {
   destinationValidateRules,
@@ -11,6 +11,7 @@ const { protect } = require('../middleware/auth');
 router.post(
   '/admin/add-destination',
   upload.array('destination_images'),
+  processImages,
   protect(['admin']),
   destinationValidateRules(),
   validate,
@@ -22,6 +23,7 @@ router.get('/destinations', destinationController.getDestinations);
 router.post(
   '/admin/edit-destination',
   upload.array('destination_images'),
+  processImages,
   protect(['admin']),
   destinationValidateRules(),
   validate,

@@ -22,6 +22,7 @@ exports.addProperty = async (req, res) => {
       floor_number: body.floor_number ? Number(body.floor_number) : null,
       build_year: body.build_year ? Number(body.build_year) : null,
       status: body.status,
+      availability: body.availability,
       publishedAt: body.status === 'active' ? new Date() : null,
     });
 
@@ -223,6 +224,7 @@ exports.editProperty = async (req, res) => {
       floor_number: body.floor_number ? Number(body.floor_number) : null,
       build_year: body.build_year ? Number(body.build_year) : null,
       status: body.status,
+      availability: body.availability,
       publishedAt: body.status === 'draft' ? null : property.publishedAt,
     });
 

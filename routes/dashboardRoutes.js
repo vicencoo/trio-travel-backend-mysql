@@ -4,13 +4,13 @@ const dashboardController = require('../controllers/dashboardController');
 const { protect } = require('../middleware/auth');
 
 router.get(
-  '/admin/dashboard',
+  '/admin/dashboard/get-data-counts',
   protect(['admin']),
   dashboardController.getDataCounts,
 );
 
 router.get(
-  '/admin/analytics',
+  '/admin/dashboard/get-analytics',
   protect(['admin']),
   dashboardController.analytics,
 );

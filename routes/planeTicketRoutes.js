@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const planeTicketController = require('../controllers/planeTicketController');
-const upload = require('../middleware/multer');
+const { upload, processImages } = require('../middleware/multer');
 const {
   planeTicketValidationRules,
   validate,
@@ -11,6 +11,7 @@ const { protect } = require('../middleware/auth');
 router.post(
   '/admin/add-ticket',
   upload.array('ticket_images', 1),
+  processImages,
   protect(['admin']),
   planeTicketValidationRules(),
   validate,
@@ -22,6 +23,7 @@ router.get('/tickets', planeTicketController.getTickets);
 router.post(
   '/admin/edit-ticket',
   upload.array('ticket_images', 1),
+  processImages,
   protect(['admin']),
   planeTicketValidationRules(),
   validate,

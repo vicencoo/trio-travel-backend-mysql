@@ -7,6 +7,8 @@ const path = require('path');
 const app = express();
 const cookieParser = require('cookie-parser');
 
+const startInsuranceReminder = require('./utils/insuranceReminder');
+
 const propertyRoutes = require('./routes/propertyRoutes');
 const planeTicketRoutes = require('./routes/planeTicketRoutes');
 const packageRoutes = require('./routes/touristPackageRoutes');
@@ -45,6 +47,8 @@ sequelize
   .then(() => {
     app.listen(port);
     console.log(`Connected on  port ${port}!`);
+
+    startInsuranceReminder();
   })
   .catch((err) => {
     console.error(err);
