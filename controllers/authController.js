@@ -129,17 +129,25 @@ exports.getCurrentUser = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const { refreshToken } = req.cookies;
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(200).json({ message: 'Already logged out' });
+    }
 
     const hashedToken = hashRefreshToken(refreshToken);
 
-    if (refreshToken) {
-      await RefreshToken.destroy({ where: { token: hashedToken } });
-      res.clearCookie('refreshToken');
-    }
-    res.json({ message: 'Logged out!' });
+    await RefreshToken.destroy({ where: { token: hashedToken } });
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+    });
+
+    return res.json({ message: 'Logged out!' });
   } catch (err) {
-    console.error('Logour error', err);
-    res.status(400).json({ message: 'Error while logging out!' });
+    console.error('Logout error', err);
+    return res.status(400).json({ message: 'Error while logging out!' });
   }
 };
