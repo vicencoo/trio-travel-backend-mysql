@@ -1,7 +1,5 @@
 const app = require('../app');
 const sequelize = require('../config/database');
-const mysql = require('mysql2');
-console.log('mysql2 loaded:', !!mysql);
 
 let initialized = false;
 
