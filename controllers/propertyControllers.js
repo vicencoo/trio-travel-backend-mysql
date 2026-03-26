@@ -28,7 +28,9 @@ exports.addProperty = async (req, res) => {
 
     if (propertyImageFiles.length > 0) {
       const property_images = propertyImageFiles.map((file) => ({
-        property_image: `/images/property_images/${file.filename}`,
+        // property_image: `/images/property_images/${file.filename}`,
+        property_image: file.cloudinaryUrl, // ✅ Cloudinary URL
+        public_id: file.cloudinaryPublicId,
         property_id: property.id,
       }));
 
