@@ -47,8 +47,6 @@ app.use(
   }),
 );
 
-app.options('*', cors());
-
 app.use(propertyRoutes);
 app.use(planeTicketRoutes);
 app.use(packageRoutes);
