@@ -17,6 +17,7 @@ const authRoutes = require('./routes/authRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const insuranceRoutes = require('./routes/insuranceRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 app.use(express.json());
 app.use(cookieParser());
@@ -55,6 +56,7 @@ app.use(authRoutes);
 app.use(bookingRoutes);
 app.use(dashboardRoutes);
 app.use(insuranceRoutes);
+app.use(contactRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

@@ -8,9 +8,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendEmail(to, subject, html) {
+async function sendEmail(to, subject, html, from = process.env.EMAIL_USER) {
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from,
     to,
     subject,
     html,
