@@ -1,19 +1,43 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
+// const authenticate = async (req, res, next) => {
+//   const token = req.headers.authorization?.split(' ')[1];
+
+//   if (!token) {
+//     return next();
+//     // return res.status(401).json({ message: 'Authentication required' });
+//   }
+//   try {
+//     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY);
+//     const user = await User.findByPk(decoded.userId);
+//     if (!user) {
+//       return res.status(401).json({ message: 'Invalid token' });
+//     }
+//     req.user = user;
+//     return next();
+//   } catch (err) {
+//     return res.status(403).json({ message: 'Invalid or expired token!' });
+//   }
+// };
 const authenticate = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const authHeaderToken = req.headers.authorization?.split(' ')[1];
+  const cookieToken = req.cookies?.accessToken;
+
+  const token = authHeaderToken || cookieToken;
 
   if (!token) {
     return next();
-    // return res.status(401).json({ message: 'Authentication required' });
   }
+
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY);
     const user = await User.findByPk(decoded.userId);
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid token' });
     }
+
     req.user = user;
     return next();
   } catch (err) {
