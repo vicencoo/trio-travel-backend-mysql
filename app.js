@@ -21,13 +21,33 @@ const insuranceRoutes = require('./routes/insuranceRoutes');
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+// app.use(
+//   cors({
+//     origin: process.env.REQUEST_ORIGIN,
+//     // origin: process.env.REQUEST_ORIGIN_NETWORK,
+//     credentials: true,
+//   }),
+// );
+const allowedOrigins = [
+  process.env.REQUEST_ORIGIN,
+  process.env.REQUEST_ORIGIN_LOCAL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.REQUEST_ORIGIN,
-    // origin: process.env.REQUEST_ORIGIN_NETWORK,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
+
+app.options('*', cors());
 
 app.use(propertyRoutes);
 app.use(planeTicketRoutes);
