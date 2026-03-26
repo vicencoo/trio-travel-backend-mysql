@@ -1,13 +1,10 @@
 require('dotenv').config({ quiet: true });
 
 const express = require('express');
-const sequelize = require('./config/database');
 const cors = require('cors');
 const path = require('path');
 const app = express();
 const cookieParser = require('cookie-parser');
-
-const startInsuranceReminder = require('./utils/insuranceReminder');
 
 const propertyRoutes = require('./routes/propertyRoutes');
 const planeTicketRoutes = require('./routes/planeTicketRoutes');
@@ -40,16 +37,16 @@ app.use(insuranceRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-const port = process.env.PORT || 8000;
+// const port = process.env.PORT || 8000;
 
-sequelize
-  .sync()
-  .then(() => {
-    app.listen(port);
-    console.log(`Connected on  port ${port}!`);
+// sequelize
+//   .sync()
+//   .then(() => {
+//     app.listen(port);
+//     console.log(`Connected on  port ${port}!`);
 
-    startInsuranceReminder();
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+//     startInsuranceReminder();
+//   })
+//   .catch((err) => {
+//     console.error(err);
+//   });
