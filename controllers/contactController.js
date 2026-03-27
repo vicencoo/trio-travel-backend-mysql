@@ -25,7 +25,7 @@ exports.sendEmail = async (req, res) => {
       to: process.env.AGENCY_EMAIL,
       subject: `Email nga ${name}`,
       html: `
-        <h3>Mesazh i ri nga faqja</h3>
+        <h3>Mesazh i ri nga Trio Travel.</h3>
         <p><strong>Emri:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Numri i telefonit:</strong> ${phoneNumber || 'Nuk është dhënë'}</p>
