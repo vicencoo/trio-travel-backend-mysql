@@ -301,58 +301,22 @@ exports.editProperty = async (req, res) => {
             : property.publishedAt,
     });
 
-    // if (deletedImgs.length) {
-    //   const imagesToDelete = await PropertyImage.findAll({
-    //     where: {
-    //       property_id: property.id,
-    //       property_image: {
-    //         [Op.in]: deletedImgs,
-    //       },
-    //     },
-    //   });
-
-    //   await Promise.all(
-    //     imagesToDelete.map(async (image) => {
-    //       if (image.public_id) {
-    //         await cloudinary.uploader.destroy(image.public_id);
-    //       }
-    //     }),
-    //   );
-
-    //   await PropertyImage.destroy({
-    //     where: {
-    //       property_id: property.id,
-    //       property_image: {
-    //         [Op.in]: deletedImgs,
-    //       },
-    //     },
-    //   });
-    // }
-
     if (deletedImgs.length) {
       const imagesToDelete = await PropertyImage.findAll({
         where: {
           property_id: property.id,
-          public_id: {
+          property_image: {
             [Op.in]: deletedImgs,
           },
         },
       });
 
-      console.log(
-        'imagesToDelete:',
-        imagesToDelete.map((img) => ({
-          id: img.id,
-          property_image: img.property_image,
-          public_id: img.public_id,
-        })),
-      );
+      console.log('imagesToDelete', imagesToDelete);
 
       await Promise.all(
         imagesToDelete.map(async (image) => {
           if (image.public_id) {
-            const result = await cloudinary.uploader.destroy(image.public_id);
-            console.log('Cloudinary delete result:', image.public_id, result);
+            await cloudinary.uploader.destroy(image.public_id);
           }
         }),
       );
@@ -360,7 +324,7 @@ exports.editProperty = async (req, res) => {
       await PropertyImage.destroy({
         where: {
           property_id: property.id,
-          public_id: {
+          property_image: {
             [Op.in]: deletedImgs,
           },
         },
