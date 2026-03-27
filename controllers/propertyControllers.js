@@ -301,6 +301,8 @@ exports.editProperty = async (req, res) => {
             ? null
             : property.publishedAt,
     });
+    console.log('property', property);
+    console.log('deletedImgs', deletedImgs);
 
     if (deletedImgs.length) {
       const imagesToDelete = await PropertyImage.findAll({
