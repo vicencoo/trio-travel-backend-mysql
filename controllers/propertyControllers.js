@@ -311,7 +311,19 @@ exports.editProperty = async (req, res) => {
         },
       });
 
+      console.debug('imagesToDelete', imagesToDelete);
       console.log('imagesToDelete', imagesToDelete);
+      console.log('imagesToDelete');
+      console.warn('imagesToDelete', imagesToDelete);
+      console.error('imagesToDelete', imagesToDelete);
+
+      await Promise.all(
+        imagesToDelete.map(async (image) => {
+          if (image.public_id) {
+            await cloudinary.uploader.destroy(image.public_id);
+          }
+        }),
+      );
 
       await Promise.all(
         imagesToDelete.map(async (image) => {
