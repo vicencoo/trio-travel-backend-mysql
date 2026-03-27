@@ -262,6 +262,7 @@ exports.publishOrDraft = async (req, res) => {
 // };
 
 exports.editProperty = async (req, res) => {
+  console.log('🔥 editProperty called');
   try {
     const { id } = req.query;
     const { body } = req;
