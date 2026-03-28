@@ -1,6 +1,6 @@
 const { Package, PackageImage } = require('../models');
-const clearImage = require('../utils/clearImage');
 const { Op } = require('sequelize');
+const cloudinary = require('cloudinary');
 
 exports.addPackage = async (req, res) => {
   try {
