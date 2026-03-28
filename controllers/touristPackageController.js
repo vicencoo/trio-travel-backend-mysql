@@ -202,7 +202,7 @@ exports.editPackage = async (req, res) => {
     if (deletedImgs.length) {
       const imagesToDelete = await PackageImage.findAll({
         where: {
-          package_id: package_id.id,
+          package_id: package.id,
           image: {
             [Op.in]: deletedImgs,
           },
