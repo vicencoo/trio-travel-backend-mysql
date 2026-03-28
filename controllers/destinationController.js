@@ -1,5 +1,5 @@
 const { Destination, DestinationImage, DestinationType } = require('../models');
-const clearImage = require('../utils/clearImage');
+const cloudinary = require('cloudinary');
 
 exports.addDestination = async (req, res) => {
   try {
@@ -23,9 +23,11 @@ exports.addDestination = async (req, res) => {
 
     if (destinationImagesFiles.length) {
       const images = destinationImagesFiles.map((file) => ({
-        destination_image: `/images/destination_images/${file.filename}`,
+        destination_image: file.cloudinaryUrl,
+        public_id: file.cloudinaryPublicId,
         destination_id: destination.id,
       }));
+
       await DestinationImage.bulkCreate(images);
     }
 
@@ -130,13 +132,22 @@ exports.editDestination = async (req, res) => {
       const img = await DestinationImage.findAll({
         where: { destination_id },
       });
-      img.forEach((image) => clearImage(image.destination_image));
+
+      await Promise.all(
+        img.map(async (image) => {
+          if (image.public_id) {
+            await cloudinary.uploader.destroy(image.public_id);
+          }
+        }),
+      );
       await DestinationImage.destroy({ where: { destination_id } });
 
       const newImages = newImageFiles.map((file) => ({
-        destination_image: `/images/destination_images/${file.filename}`,
+        destination_image: file.cloudinaryUrl,
+        public_id: file.cloudinaryPublicId,
         destination_id,
       }));
+
       await DestinationImage.bulkCreate(newImages);
     }
 
@@ -154,7 +165,13 @@ exports.deleteDestination = async (req, res) => {
       where: { destination_id },
     });
 
-    images.forEach((image) => clearImage(image.destination_image));
+    await Promise.all(
+      images.map(async (image) => {
+        if (image.public_id) {
+          await cloudinary.uploader.destroy(image.public_id);
+        }
+      }),
+    );
 
     await Destination.destroy({ where: { id: destination_id } });
 

@@ -1,6 +1,6 @@
 const { PlaneTicket, PlaneTicketImage } = require('../models');
-const clearImage = require('../utils/clearImage');
 const { Op } = require('sequelize');
+const cloudinary = require('cloudinary');
 
 exports.addPlaneTicket = async (req, res) => {
   try {
@@ -17,7 +17,8 @@ exports.addPlaneTicket = async (req, res) => {
 
     if (ticketImageFiles.length) {
       const ticket_images = ticketImageFiles.map((file) => ({
-        image: `/images/ticket_images/${file.filename}`,
+        image: file.cloudinaryUrl,
+        public_id: file.cloudinaryPublicId,
         ticket_id: planeTicket.id,
       }));
 
@@ -119,14 +120,20 @@ exports.editTicket = async (req, res) => {
       const img = await PlaneTicketImage.findAll({
         where: { ticket_id: planeTicket.id },
       });
-      img.forEach((image) => {
-        clearImage(image.image);
-      });
+
+      await Promise.all(
+        img.map(async (image) => {
+          if (image.public_id) {
+            await cloudinary.uploader.destroy(image.public_id);
+          }
+        }),
+      );
 
       await PlaneTicketImage.destroy({ where: { ticket_id: planeTicket.id } });
 
       const ticket_images = ticketImageFiles.map((file) => ({
-        image: `/images/ticket_images/${file.filename}`,
+        image: file.cloudinaryUrl,
+        public_id: file.cloudinaryPublicId,
         ticket_id: planeTicket.id,
       }));
       await PlaneTicketImage.bulkCreate(ticket_images);
@@ -143,8 +150,6 @@ exports.deleteTicket = async (req, res) => {
   try {
     const { ticketId } = req.query;
 
-    console.log('ticketId', ticketId);
-
     const planeTicket = await PlaneTicket.findByPk(ticketId, {
       include: [{ model: PlaneTicketImage, as: 'ticket_images' }],
     });
@@ -152,9 +157,13 @@ exports.deleteTicket = async (req, res) => {
     if (!planeTicket)
       return res.status(404).json({ message: 'No plane ticket was found' });
 
-    planeTicket.ticket_images.forEach((img) => {
-      clearImage(img.image);
-    });
+    await Promise.all(
+      planeTicket.ticket_images.map(async (image) => {
+        if (image.public_id) {
+          await cloudinary.uploader.destroy(image.public_id);
+        }
+      }),
+    );
 
     await PlaneTicketImage.destroy({ where: { ticket_id: ticketId } });
     await PlaneTicket.destroy({ where: { id: ticketId } });

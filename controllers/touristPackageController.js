@@ -224,7 +224,8 @@ exports.editPackage = async (req, res) => {
 
     if (newImageFiles.length) {
       const newImages = newImageFiles.map((file) => ({
-        image: `/images/package_images/${file.filename}`,
+        image: file.cloudinaryUrl,
+        public_id: file.cloudinaryPublicId,
         package_id: package.id,
       }));
       await PackageImage.bulkCreate(newImages);
