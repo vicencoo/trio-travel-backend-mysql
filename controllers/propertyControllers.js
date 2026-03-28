@@ -1,6 +1,5 @@
 const { Op } = require('sequelize');
 const { Property, PropertyImage } = require('../models');
-// const clearImage = require('../utils/clearImage');
 const cloudinary = require('cloudinary');
 
 exports.addProperty = async (req, res) => {
@@ -29,7 +28,6 @@ exports.addProperty = async (req, res) => {
 
     if (propertyImageFiles.length > 0) {
       const property_images = propertyImageFiles.map((file) => ({
-        // property_image: `/images/property_images/${file.filename}`,
         property_image: file.cloudinaryUrl, // ✅ Cloudinary URL
         public_id: file.cloudinaryPublicId,
         property_id: property.id,
@@ -196,73 +194,7 @@ exports.publishOrDraft = async (req, res) => {
   }
 };
 
-// exports.editProperty = async (req, res) => {
-//   try {
-//     const { id } = req.query;
-//     const { body } = req;
-//     const newImageFiles = req.files || [];
-
-//     const deletedImgs = body.deletedImages
-//       ? JSON.parse(body.deletedImages)
-//       : [];
-
-//     const property = await Property.findByPk(id);
-
-//     if (!property) {
-//       return res.status(404).json({ message: 'Property not found!' });
-//     }
-
-//     await property.update({
-//       title: body.title,
-//       property_type: body.property_type,
-//       listing_type: body.listing_type,
-//       description: body.description,
-//       city: body.city,
-//       street: body.street,
-//       area: body.area,
-//       price: Number(body.price),
-//       space: Number(body.space),
-//       bedrooms: body.bedrooms ? Number(body.bedrooms) : null,
-//       toilets: body.toilets ? Number(body.toilets) : null,
-//       floor_number: body.floor_number ? Number(body.floor_number) : null,
-//       build_year: body.build_year ? Number(body.build_year) : null,
-//       status: body.status,
-//       availability: body.availability,
-//       publishedAt: body.status === 'draft' ? null : property.publishedAt,
-//     });
-
-//     if (deletedImgs.length) {
-//       const images = await PropertyImage.findAll({
-//         where: { property_image: deletedImgs, property_id: property.id },
-//       });
-
-//       images.forEach((image) => {
-//         clearImage(image.property_image);
-//       });
-
-//       await PropertyImage.destroy({
-//         where: { property_image: deletedImgs, property_id: property.id },
-//       });
-//     }
-
-//     if (newImageFiles.length) {
-//       const newImages = newImageFiles.map((file) => ({
-//         property_image: `/images/property_images/${file.filename}`,
-//         property_id: property.id,
-//       }));
-
-//       await PropertyImage.bulkCreate(newImages);
-//     }
-
-//     res.json({ message: 'Property updated successfully!' });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: 'Error while editing the property' });
-//   }
-// };
-
 exports.editProperty = async (req, res) => {
-  console.log('🔥 editProperty called');
   try {
     const { id } = req.query;
     const { body } = req;
@@ -301,8 +233,6 @@ exports.editProperty = async (req, res) => {
             ? null
             : property.publishedAt,
     });
-    console.log('property', property);
-    console.log('deletedImgs', deletedImgs);
 
     if (deletedImgs.length) {
       const imagesToDelete = await PropertyImage.findAll({
@@ -313,20 +243,6 @@ exports.editProperty = async (req, res) => {
           },
         },
       });
-
-      console.debug('imagesToDelete', imagesToDelete);
-      console.log('imagesToDelete', imagesToDelete);
-      console.log('imagesToDelete');
-      console.warn('imagesToDelete', imagesToDelete);
-      console.error('imagesToDelete', imagesToDelete);
-
-      await Promise.all(
-        imagesToDelete.map(async (image) => {
-          if (image.public_id) {
-            await cloudinary.uploader.destroy(image.public_id);
-          }
-        }),
-      );
 
       await Promise.all(
         imagesToDelete.map(async (image) => {

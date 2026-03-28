@@ -21,7 +21,9 @@ exports.addPackage = async (req, res) => {
 
     if (packageImageFiles.length) {
       const package_images = packageImageFiles.map((file) => ({
-        image: `/images/package_images/${file.filename}`,
+        image: file.cloudinaryUrl,
+        public_id: file.cloudinaryPublicId,
+
         package_id: package.id,
       }));
       await PackageImage.bulkCreate(package_images);
@@ -198,13 +200,22 @@ exports.editPackage = async (req, res) => {
     });
 
     if (deletedImgs.length) {
-      const images = await PackageImage.findAll({
-        where: { image: deletedImgs, package_id: package.id },
+      const imagesToDelete = await PackageImage.findAll({
+        where: {
+          package_id: package_id.id,
+          image: {
+            [Op.in]: deletedImgs,
+          },
+        },
       });
 
-      images.forEach((img) => {
-        clearImage(img.image);
-      });
+      await Promise.all(
+        imagesToDelete.map(async (image) => {
+          if (image.public_id) {
+            await cloudinary.uploader.destroy(image.public_id);
+          }
+        }),
+      );
 
       await PackageImage.destroy({
         where: { image: deletedImgs, package_id: package.id },
@@ -238,7 +249,13 @@ exports.deletePackage = async (req, res) => {
       return res.status(404).json({ message: 'Package not found' });
     }
 
-    package.package_images.forEach((p) => clearImage(p.image));
+    await Promise.all(
+      package.package_images.map(async (image) => {
+        if (image.public_id) {
+          await cloudinary.uploader.destroy(image.public_id);
+        }
+      }),
+    );
 
     await PackageImage.destroy({ where: { package_id: packageId } });
 

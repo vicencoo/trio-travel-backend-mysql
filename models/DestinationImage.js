@@ -12,6 +12,10 @@ const DestinationImage = sequelize.define(
       primaryKey: true,
     },
     destination_image: { type: Sequelize.STRING },
+    public_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     destination_id: {
       type: Sequelize.INTEGER,
       allowNull: false,

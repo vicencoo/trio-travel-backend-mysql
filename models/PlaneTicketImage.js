@@ -12,6 +12,10 @@ const PlaneTicketImage = sequelize.define(
       primaryKey: true,
     },
     image: { type: Sequelize.STRING, allowNull: false },
+    public_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     ticket_id: {
       type: Sequelize.INTEGER,
       allowNull: false,

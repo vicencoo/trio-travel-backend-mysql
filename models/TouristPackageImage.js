@@ -15,6 +15,10 @@ const PackageImage = sequelize.define(
       type: Sequelize.STRING,
       allowNull: false,
     },
+    public_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     package_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
