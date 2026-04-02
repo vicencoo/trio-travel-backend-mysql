@@ -21,11 +21,15 @@ exports.login = async (req, res) => {
     const refreshToken = generateRefreshToken(user);
     const hashedRefreshToken = hashRefreshToken(refreshToken);
 
+    const isProduction = process.env.SECURE_ENV === 'production';
+
     // Send refresh token in HttpOnly cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      // secure: false,
+      // sameSite: 'lax',
+      secure: isProduction, // MUST be true in production
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
