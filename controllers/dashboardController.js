@@ -56,6 +56,94 @@ exports.getDataCounts = async (req, res) => {
   }
 };
 
+// Note: This approach has error when using PostgreSQL
+
+// exports.analytics = async (req, res) => {
+//   try {
+//     const now = new Date();
+//     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+//     const monthEnd = new Date(
+//       now.getFullYear(),
+//       now.getMonth() + 1,
+//       0,
+//       23,
+//       59,
+//       59,
+//     );
+
+//     const [monthlyRevenue, dailyTickets, monthlyTickets, ticketStatus] =
+//       await Promise.all([
+//         // 1. Monthly Revenue
+//         Booking.findAll({
+//           attributes: [
+//             [fn('DATE_FORMAT', col('created_at'), '%b'), 'month'],
+//             [fn('MONTH', col('created_at')), 'month_num'],
+//             [fn('ROUND', fn('SUM', col('ticket_price')), 2), 'revenue'],
+//           ],
+//           where: { created_at: { [Op.not]: null } },
+//           group: [
+//             fn('MONTH', col('created_at')),
+//             fn('DATE_FORMAT', col('created_at'), '%b'),
+//           ],
+//           order: [[literal('month_num'), 'ASC']],
+//           raw: true,
+//         }),
+
+//         // 2. Daily Tickets (current month only)
+//         Booking.findAll({
+//           attributes: [
+//             [fn('DATE_FORMAT', col('created_at'), '%b %d'), 'day'],
+//             [fn('COUNT', col('id')), 'tickets'],
+//           ],
+//           where: {
+//             created_at: {
+//               [Op.not]: null,
+//               [Op.between]: [monthStart, monthEnd],
+//             },
+//           },
+//           group: [
+//             fn('DATE', col('created_at')),
+//             fn('DATE_FORMAT', col('created_at'), '%b %d'),
+//           ],
+//           order: [[fn('DATE', col('created_at')), 'ASC']],
+//           raw: true,
+//         }),
+
+//         // 3. Monthly Tickets
+//         Booking.findAll({
+//           attributes: [
+//             [fn('DATE_FORMAT', col('created_at'), '%b'), 'month'],
+//             [fn('MONTH', col('created_at')), 'month_num'],
+//             [fn('COUNT', col('id')), 'tickets'],
+//           ],
+//           where: { created_at: { [Op.not]: null } },
+//           group: [
+//             fn('MONTH', col('created_at')),
+//             fn('DATE_FORMAT', col('created_at'), '%b'),
+//           ],
+//           order: [[literal('month_num'), 'ASC']],
+//           raw: true,
+//         }),
+
+//         // 4. Ticket Status breakdown
+//         Booking.findAll({
+//           attributes: [
+//             ['status', 'name'],
+//             [fn('COUNT', col('id')), 'value'],
+//           ],
+//           where: { status: { [Op.not]: null } },
+//           group: ['status'],
+//           raw: true,
+//         }),
+//       ]);
+
+//     res.json({ monthlyRevenue, dailyTickets, monthlyTickets, ticketStatus });
+//   } catch (error) {
+//     console.error('Analytics error:', error);
+//     res.status(500).json({ error: 'Failed to fetch analytics' });
+//   }
+// };
+
 exports.analytics = async (req, res) => {
   try {
     const now = new Date();
@@ -69,61 +157,63 @@ exports.analytics = async (req, res) => {
       59,
     );
 
+    const dateColumn = 'ticket_date'; // or 'created_at' if that column really exists and is what you want
+
     const [monthlyRevenue, dailyTickets, monthlyTickets, ticketStatus] =
       await Promise.all([
-        // 1. Monthly Revenue
         Booking.findAll({
           attributes: [
-            [fn('DATE_FORMAT', col('created_at'), '%b'), 'month'],
-            [fn('MONTH', col('created_at')), 'month_num'],
+            [literal(`TO_CHAR("${dateColumn}", 'Mon')`), 'month'],
+            [literal(`EXTRACT(MONTH FROM "${dateColumn}")`), 'month_num'],
             [fn('ROUND', fn('SUM', col('ticket_price')), 2), 'revenue'],
           ],
-          where: { created_at: { [Op.not]: null } },
+          where: {
+            [dateColumn]: { [Op.not]: null },
+          },
           group: [
-            fn('MONTH', col('created_at')),
-            fn('DATE_FORMAT', col('created_at'), '%b'),
+            literal(`EXTRACT(MONTH FROM "${dateColumn}")`),
+            literal(`TO_CHAR("${dateColumn}", 'Mon')`),
           ],
           order: [[literal('month_num'), 'ASC']],
           raw: true,
         }),
 
-        // 2. Daily Tickets (current month only)
         Booking.findAll({
           attributes: [
-            [fn('DATE_FORMAT', col('created_at'), '%b %d'), 'day'],
+            [literal(`TO_CHAR("${dateColumn}", 'Mon DD')`), 'day'],
             [fn('COUNT', col('id')), 'tickets'],
           ],
           where: {
-            created_at: {
+            [dateColumn]: {
               [Op.not]: null,
               [Op.between]: [monthStart, monthEnd],
             },
           },
           group: [
-            fn('DATE', col('created_at')),
-            fn('DATE_FORMAT', col('created_at'), '%b %d'),
+            literal(`DATE("${dateColumn}")`),
+            literal(`TO_CHAR("${dateColumn}", 'Mon DD')`),
           ],
-          order: [[fn('DATE', col('created_at')), 'ASC']],
+          order: [[literal(`DATE("${dateColumn}")`), 'ASC']],
           raw: true,
         }),
 
-        // 3. Monthly Tickets
         Booking.findAll({
           attributes: [
-            [fn('DATE_FORMAT', col('created_at'), '%b'), 'month'],
-            [fn('MONTH', col('created_at')), 'month_num'],
+            [literal(`TO_CHAR("${dateColumn}", 'Mon')`), 'month'],
+            [literal(`EXTRACT(MONTH FROM "${dateColumn}")`), 'month_num'],
             [fn('COUNT', col('id')), 'tickets'],
           ],
-          where: { created_at: { [Op.not]: null } },
+          where: {
+            [dateColumn]: { [Op.not]: null },
+          },
           group: [
-            fn('MONTH', col('created_at')),
-            fn('DATE_FORMAT', col('created_at'), '%b'),
+            literal(`EXTRACT(MONTH FROM "${dateColumn}")`),
+            literal(`TO_CHAR("${dateColumn}", 'Mon')`),
           ],
           order: [[literal('month_num'), 'ASC']],
           raw: true,
         }),
 
-        // 4. Ticket Status breakdown
         Booking.findAll({
           attributes: [
             ['status', 'name'],
@@ -137,7 +227,8 @@ exports.analytics = async (req, res) => {
 
     res.json({ monthlyRevenue, dailyTickets, monthlyTickets, ticketStatus });
   } catch (error) {
-    console.error('Analytics error:', error);
+    console.error('Analytics error message:', error.message);
+    console.error('Analytics full error:', error);
     res.status(500).json({ error: 'Failed to fetch analytics' });
   }
 };
