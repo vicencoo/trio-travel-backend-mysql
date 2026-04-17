@@ -34,6 +34,9 @@ const allowedOrigins = [
   process.env.REQUEST_ORIGIN_LOCAL,
 ].filter(Boolean);
 
+// REQUEST_ORIGIN=https://triotravel.al
+// REQUEST_ORIGIN_WWW=https://www.triotravel.al
+
 app.use(
   cors({
     origin: function (origin, callback) {
