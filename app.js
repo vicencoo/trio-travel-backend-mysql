@@ -29,13 +29,14 @@ app.use(express.urlencoded({ extended: true }));
 //     credentials: true,
 //   }),
 // );
-const allowedOrigins = [
-  process.env.REQUEST_ORIGIN,
-  process.env.REQUEST_ORIGIN_LOCAL,
-].filter(Boolean);
-
-// REQUEST_ORIGIN=https://triotravel.al
-// REQUEST_ORIGIN_WWW=https://www.triotravel.al
+// const allowedOrigins = [
+//   process.env.REQUEST_ORIGIN,
+//   process.env.REQUEST_ORIGIN_WWW,
+//   process.env.REQUEST_ORIGIN_LOCAL,
+// ].filter(Boolean);
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ?.split(',')
+  .map(origin => origin.trim());
 
 app.use(
   cors({
