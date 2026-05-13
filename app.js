@@ -174,10 +174,9 @@ app.get("/paketat/:slug", async (req, res) => {
 });
 
 /* REACT FALLBACK */
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(frontendDistPath, "index.html"));
 });
-
 // const port = process.env.PORT || 8000;
 
 // sequelize
