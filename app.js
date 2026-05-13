@@ -69,7 +69,6 @@ app.use(insuranceRoutes);
 app.use(contactRoutes);
 
 app.use("/images", express.static(path.join(__dirname, "images")));
-app.use(express.static(frontendDistPath));
 
 function escapeHtml(value = "") {
   return String(value)
@@ -172,6 +171,8 @@ app.get("/paketat/:slug", async (req, res) => {
     return res.sendFile(path.join(frontendDistPath, "index.html"));
   }
 });
+
+app.use(express.static(frontendDistPath));
 
 /* REACT FALLBACK */
 app.use((req, res) => {
