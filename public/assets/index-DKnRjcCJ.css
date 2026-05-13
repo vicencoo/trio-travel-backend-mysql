@@ -1,0 +1,1 @@
+@keyframes slideIn{0%{transform:translate(100%);opacity:0}to{transform:translate(0);opacity:1}}@keyframes fadeIn{0%{background:#0000}to{background:#0006}}.panel-slide{animation:slideIn .35s cubic-bezier(.4,0,.2,1) forwards}.overlay-fade{animation:fadeIn .35s ease forwards}
