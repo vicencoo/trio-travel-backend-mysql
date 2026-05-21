@@ -139,15 +139,17 @@ exports.editInsurance = async (req, res) => {
       req.body;
 
     const insurance = await Insurance.findByPk(insuranceId);
+    const name = client_name.toLowerCase();
+    const plate = car_plate.toLowerCase();
 
     if (!insurance) {
       return res.status(404).json({ message: "No insurance was found" });
     }
 
     await insurance.update({
-      client_name,
+      client_name: name,
       contact_number,
-      car_plate,
+      car_plate: plate,
       expiration_date,
     });
 

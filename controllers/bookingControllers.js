@@ -1,33 +1,35 @@
 /** @type {import('sequelize').ModelStatic<any>} */
-const Booking = require('../models/Booking');
-const { Op } = require('sequelize');
+const Booking = require("../models/Booking");
+const { Op } = require("sequelize");
 
 exports.addBooking = async (req, res) => {
   try {
     const { client_name, ticket_date, ticket_code, ticket_price } = req.body;
+    const name = client_name.toLowerCase();
+    const code = ticket_code.toLowerCase();
 
     await Booking.create({
-      client_name,
+      client_name: name,
       ticket_date,
-      ticket_code,
+      ticket_code: code,
       ticket_price: Number(ticket_price),
     });
 
-    res.json({ message: 'Booking saved!' });
+    res.json({ message: "Booking saved!" });
   } catch (err) {
-    console.error('Add booking error', err);
-    res.status(400).json({ message: 'Error while adding new booking' });
+    console.error("Add booking error", err);
+    res.status(400).json({ message: "Error while adding new booking" });
   }
 };
 
 exports.getBookings = async (req, res) => {
   try {
-    const bookings = await Booking.findAll({ order: [['createdAt', 'DESC']] });
+    const bookings = await Booking.findAll({ order: [["createdAt", "DESC"]] });
 
     res.json(bookings);
   } catch (err) {
-    console.error('Get bookings error', err);
-    res.status(400).json({ message: 'Error while getting all bookings' });
+    console.error("Get bookings error", err);
+    res.status(400).json({ message: "Error while getting all bookings" });
   }
 };
 
@@ -50,14 +52,14 @@ exports.getCheckinTickets = async (req, res) => {
         where: {
           ticket_date: { [Op.between]: [startOfNextDay, endOfNextDay] },
         },
-        order: [['createdAt', 'DESC']],
+        order: [["createdAt", "DESC"]],
       });
 
     stats.completedTickets = checkInTickets.filter(
-      (item) => item.status === 'completed',
+      (item) => item.status === "completed",
     ).length;
     stats.pendingTickets = checkInTickets.filter(
-      (item) => item.status === 'pending',
+      (item) => item.status === "pending",
     ).length;
 
     stats.progress =
@@ -69,8 +71,8 @@ exports.getCheckinTickets = async (req, res) => {
 
     res.json({ tickets: checkInTickets, stats });
   } catch (err) {
-    console.error('Get checkin tickets error', err);
-    res.status(400).json({ message: 'Error while getting checkin tickets' });
+    console.error("Get checkin tickets error", err);
+    res.status(400).json({ message: "Error while getting checkin tickets" });
   }
 };
 
@@ -81,17 +83,17 @@ exports.bookingToggleStatus = async (req, res) => {
     const booking = await Booking.findByPk(bookingId);
 
     if (!booking) {
-      return res.status(404).json({ message: 'Booking not found!' });
+      return res.status(404).json({ message: "Booking not found!" });
     }
 
-    booking.status = booking.status === 'pending' ? 'completed' : 'pending';
+    booking.status = booking.status === "pending" ? "completed" : "pending";
 
     await booking.save();
 
-    res.json({ message: 'Status updated' });
+    res.json({ message: "Status updated" });
   } catch (err) {
-    console.error('Toggle status error', err);
-    res.status(400).json({ message: 'Error while toggling status' });
+    console.error("Toggle status error", err);
+    res.status(400).json({ message: "Error while toggling status" });
   }
 };
 
@@ -99,24 +101,26 @@ exports.editBooking = async (req, res) => {
   try {
     const { bookingId } = req.query;
     const { client_name, ticket_date, ticket_code, ticket_price } = req.body;
+    const name = client_name.toLowerCase();
+    const code = ticket_code.toLowerCase();
 
     const booking = await Booking.findByPk(bookingId);
 
     if (!booking) {
-      return res.status(404).json({ message: 'No booking found' });
+      return res.status(404).json({ message: "No booking found" });
     }
 
     await booking.update({
-      client_name,
+      client_name: name,
       ticket_date,
-      ticket_code,
+      ticket_code: code,
       ticket_price: Number(ticket_price),
     });
 
-    res.json({ message: 'Booking Updated' });
+    res.json({ message: "Booking Updated" });
   } catch (err) {
-    console.error('Edit booking error', err);
-    res.status(400).json({ message: 'Error while edit booking!' });
+    console.error("Edit booking error", err);
+    res.status(400).json({ message: "Error while edit booking!" });
   }
 };
 
@@ -126,9 +130,9 @@ exports.deleteBooking = async (req, res) => {
 
     await Booking.destroy({ where: { id: bookingId } });
 
-    res.json({ message: 'Booking deleted successfully' });
+    res.json({ message: "Booking deleted successfully" });
   } catch (err) {
-    console.error('Delete booking error', err);
-    res.status(400).json({ message: 'Error while deleting booking' });
+    console.error("Delete booking error", err);
+    res.status(400).json({ message: "Error while deleting booking" });
   }
 };
