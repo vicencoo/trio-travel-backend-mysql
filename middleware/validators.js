@@ -1,123 +1,130 @@
-const { body, validationResult } = require('express-validator');
+const { body, validationResult } = require("express-validator");
 
 const propertyValidationRules = () => {
   return [
-    body('title').notEmpty().withMessage('Shrkuani titullin e postimit'),
-    body('property_type').notEmpty().withMessage('Selektoni tipin e pronës'),
-    body('description').notEmpty().withMessage('Shkruani përshkrimin e pronës'),
-    body('city').notEmpty().withMessage('Shkruani qytetin'),
-    body('street').notEmpty().withMessage('Shkruani emrin e rrugës'),
-    body('area').notEmpty().withMessage('Shkruani emrin e zonës'),
-    body('price')
+    body("title").notEmpty().withMessage("Shrkuani titullin e postimit"),
+    body("property_type").notEmpty().withMessage("Selektoni tipin e pronës"),
+    body("description").notEmpty().withMessage("Shkruani përshkrimin e pronës"),
+    body("city").notEmpty().withMessage("Shkruani qytetin"),
+    body("street").notEmpty().withMessage("Shkruani emrin e rrugës"),
+    body("area").notEmpty().withMessage("Shkruani emrin e zonës"),
+    body("price")
       .notEmpty()
-      .withMessage('Vendosni cmimin e pronës')
+      .withMessage("Vendosni cmimin e pronës")
       .isNumeric()
-      .withMessage('Çmimi duhet të jetë një numër i vlefshëm'),
-    body('space').notEmpty().withMessage('Shkruani hapësirën e pronës'),
+      .withMessage("Çmimi duhet të jetë një numër i vlefshëm"),
+    body("space").notEmpty().withMessage("Shkruani hapësirën e pronës"),
   ];
 };
 
 const packageValidationRules = () => {
   return [
-    body('title').notEmpty().withMessage('Shkuani titullin e pakëtes'),
-    body('destination').notEmpty().withMessage('Shkruani destinacionin'),
-    body('price').notEmpty().withMessage('Vendosni cmimin e paketës'),
-    body('duration').notEmpty().withMessage('Shkruani kohëzgjatjen'),
-    body('description')
+    body("title").notEmpty().withMessage("Shkuani titullin e pakëtes"),
+    body("destination").notEmpty().withMessage("Shkruani destinacionin"),
+    body("price").notEmpty().withMessage("Vendosni cmimin e paketës"),
+    body("duration").notEmpty().withMessage("Shkruani kohëzgjatjen"),
+    body("description")
       .notEmpty()
-      .withMessage('Shkruani përshkrimin e paketës'),
-    body('accomodation').notEmpty().withMessage('Zgjidhni akomodimin'),
-    body('meal_included').notEmpty().withMessage('Zgjidhni vaktet e përfshira'),
+      .withMessage("Shkruani përshkrimin e paketës"),
+    body("accomodation").notEmpty().withMessage("Zgjidhni akomodimin"),
+    body("meal_included").notEmpty().withMessage("Zgjidhni vaktet e përfshira"),
   ];
 };
 
 const planeTicketValidationRules = () => {
   return [
-    body('from')
+    body("from")
       .notEmpty()
-      .withMessage('Ju lutemi shkruani aeroportin e nisjes.'),
+      .withMessage("Ju lutemi shkruani aeroportin e nisjes."),
 
-    body('to')
+    body("to")
       .notEmpty()
-      .withMessage('Ju lutemi shkruani aeroportin e destinacionit.'),
+      .withMessage("Ju lutemi shkruani aeroportin e destinacionit."),
 
-    body('departure_airport')
+    body("departure_airport")
       .notEmpty()
       .withMessage(
         'Ju lutemi shkruani kodin e aeroportit të nisjes (p.sh. "TIA").',
       ),
 
-    body('arrival_airport')
+    body("arrival_airport")
       .notEmpty()
       .withMessage(
         'Ju lutemi shkruani kodin e aeroportit të destinacionit (p.sh. "NYC").',
       ),
 
-    body('price')
+    body("price")
       .notEmpty()
-      .withMessage('Ju lutemi vendosni çmimin e biletës.')
+      .withMessage("Ju lutemi vendosni çmimin e biletës.")
       .isNumeric()
-      .withMessage('Çmimi duhet të jetë një numër i vlefshëm.'),
+      .withMessage("Çmimi duhet të jetë një numër i vlefshëm."),
   ];
 };
 
 const destinationValidateRules = () => {
   return [
-    body('city').notEmpty().withMessage('Shkruani qytetin.'),
-    body('country').notEmpty().withMessage('Shkruani shtetin.'),
-    body('slogan').notEmpty().withMessage('Shkruani sloganin.'),
+    body("city").notEmpty().withMessage("Shkruani qytetin."),
+    body("country").notEmpty().withMessage("Shkruani shtetin."),
+    body("slogan").notEmpty().withMessage("Shkruani sloganin."),
   ];
 };
 
 const bookingValidationRules = () => {
   return [
-    body('client_name')
+    body("client_name")
       .notEmpty()
-      .withMessage('Ju lutem shkruani emrin e klinetit'),
+      .withMessage("Ju lutem shkruani emrin e klinetit"),
 
-    body('ticket_code').notEmpty().withMessage('Shkruani kodin e biletës'),
+    body("ticket_code").notEmpty().withMessage("Shkruani kodin e biletës"),
 
-    body('ticket_date')
+    body("ticket_date")
       .notEmpty()
-      .withMessage('Zgjidhni datën që do të beni check in të biletës'),
+      .withMessage("Zgjidhni datën që do të beni check in të biletës"),
 
-    body('ticket_price').notEmpty().withMessage('Vendosni cmimin e biletës'),
+    body("flight_company_id")
+      .notEmpty()
+      .withMessage("Selektoni nje kompani fluturimi")
+      .bail()
+      .isInt({ min: 1 })
+      .withMessage("Kompania e fluturimit nuk është valide"),
+
+    body("ticket_price").notEmpty().withMessage("Vendosni cmimin e biletës"),
   ];
 };
 
 const loginValidationRules = () => {
   return [
-    body('email')
+    body("email")
       .isEmail()
-      .withMessage('Ju lutemi shkruani një email të vlefshëm.'),
+      .withMessage("Ju lutemi shkruani një email të vlefshëm."),
 
-    body('password').notEmpty().withMessage('Ju lutemi shkruani fjalëkalimin.'),
+    body("password").notEmpty().withMessage("Ju lutemi shkruani fjalëkalimin."),
   ];
 };
 
 const signupValidationRules = () => {
   return [
-    body('email')
+    body("email")
       .isEmail()
-      .withMessage('Ju lutemi shkruani një email të vlefshëm.'),
-    body('username')
+      .withMessage("Ju lutemi shkruani një email të vlefshëm."),
+    body("username")
       .notEmpty()
-      .withMessage('Ju lutemi shkruani një emër përdoruesi.'),
-    body('password')
+      .withMessage("Ju lutemi shkruani një emër përdoruesi."),
+    body("password")
       .isLength({ min: 7 })
-      .withMessage('Fjalëkalimi duhet të jetë të paktën 7 karaktere.'),
+      .withMessage("Fjalëkalimi duhet të jetë të paktën 7 karaktere."),
   ];
 };
 
 const insuranceValidationRules = () => {
   return [
-    body('client_name').notEmpty().withMessage('Vendosni emrin e klientit.'),
-    body('contact_number')
+    body("client_name").notEmpty().withMessage("Vendosni emrin e klientit."),
+    body("contact_number")
       .notEmpty()
-      .withMessage('Vendosni një numër telefoni.')
+      .withMessage("Vendosni një numër telefoni.")
       .isMobilePhone()
-      .withMessage('Vendosni një numër të vlefshëm.'),
-    body('car_plate').notEmpty().withMessage('Vendosni një targë makine.'),
+      .withMessage("Vendosni një numër të vlefshëm."),
+    body("car_plate").notEmpty().withMessage("Vendosni një targë makine."),
   ];
 };
 

@@ -1,35 +1,35 @@
-const { User, RefreshToken } = require('../models');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { User, RefreshToken } = require("../models");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const {
   generateAccessToken,
   generateRefreshToken,
   hashRefreshToken,
-} = require('../utils/tokenManager');
+} = require("../utils/tokenManager");
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ message: 'No user found' });
+    if (!user) return res.status(404).json({ message: "Wrong credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Wrong credentials' });
+    if (!isMatch) return res.status(400).json({ message: "Wrong credentials" });
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     const hashedRefreshToken = hashRefreshToken(refreshToken);
 
-    const isProduction = process.env.SECURE_ENV === 'production';
+    const isProduction = process.env.SECURE_ENV === "production";
 
     // Send refresh token in HttpOnly cookie
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       // secure: false,
       // sameSite: 'lax',
       secure: isProduction, // MUST be true in production
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -44,8 +44,8 @@ exports.login = async (req, res) => {
       user: { id: user.id, email: user.email, role: user.role },
     });
   } catch (err) {
-    console.error('Login error', err);
-    res.status(400).json({ message: 'Login failed' });
+    console.error("Login error", err);
+    res.status(400).json({ message: "Login failed" });
   }
 };
 
@@ -55,10 +55,10 @@ exports.signup = async (req, res) => {
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already in use' });
+      return res.status(400).json({ message: "Email already in use" });
     }
     if (password !== confirmPassword) {
-      return res.status(400).json({ message: 'Passwords do not match' });
+      return res.status(400).json({ message: "Passwords do not match" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -69,9 +69,9 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error('Signup error', err);
+    console.error("Signup error", err);
   }
 };
 
@@ -79,14 +79,14 @@ exports.refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-      return res.status(401).json({ message: 'No refresh token provided' });
+      return res.status(401).json({ message: "No refresh token provided" });
     }
     const hashedRefreshToken = hashRefreshToken(refreshToken);
     const dbRefreshToken = await RefreshToken.findOne({
       where: { token: hashedRefreshToken },
     });
     if (!dbRefreshToken) {
-      return res.status(403).json({ message: 'Invalid refresh token' });
+      return res.status(403).json({ message: "Invalid refresh token" });
     }
 
     jwt.verify(
@@ -97,7 +97,7 @@ exports.refreshToken = async (req, res) => {
           await RefreshToken.destroy({ where: { token: hashedRefreshToken } });
           return res
             .status(403)
-            .json({ message: 'Refresh token expired. Please login again.' });
+            .json({ message: "Refresh token expired. Please login again." });
         }
 
         const user = await User.findByPk(decoded.userId);
@@ -107,10 +107,10 @@ exports.refreshToken = async (req, res) => {
       },
     );
   } catch (err) {
-    console.error('Refresh token error', err);
+    console.error("Refresh token error", err);
     res
       .status(400)
-      .json({ message: 'Error while refreshing the access token' });
+      .json({ message: "Error while refreshing the access token" });
   }
 };
 
@@ -126,8 +126,8 @@ exports.getCurrentUser = async (req, res) => {
     };
     res.json({ user: currentUser });
   } catch (err) {
-    console.error('Get user error', err);
-    res.status(400).json({ message: 'Error while getting current user' });
+    console.error("Get user error", err);
+    res.status(400).json({ message: "Error while getting current user" });
   }
 };
 
@@ -136,22 +136,22 @@ exports.logout = async (req, res) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
-      return res.status(200).json({ message: 'Already logged out' });
+      return res.status(200).json({ message: "Already logged out" });
     }
 
     const hashedToken = hashRefreshToken(refreshToken);
 
     await RefreshToken.destroy({ where: { token: hashedToken } });
 
-    res.clearCookie('refreshToken', {
+    res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
-      sameSite: 'None',
+      sameSite: "None",
     });
 
-    return res.json({ message: 'Logged out!' });
+    return res.json({ message: "Logged out!" });
   } catch (err) {
-    console.error('Logout error', err);
-    return res.status(400).json({ message: 'Error while logging out!' });
+    console.error("Logout error", err);
+    return res.status(400).json({ message: "Error while logging out!" });
   }
 };

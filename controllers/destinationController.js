@@ -1,5 +1,5 @@
-const { Destination, DestinationImage, DestinationType } = require('../models');
-const cloudinary = require('cloudinary');
+const { Destination, DestinationImage, DestinationType } = require("../models");
+const cloudinary = require("cloudinary");
 
 exports.addDestination = async (req, res) => {
   try {
@@ -31,10 +31,10 @@ exports.addDestination = async (req, res) => {
       await DestinationImage.bulkCreate(images);
     }
 
-    res.json({ message: 'Destination created!' });
+    res.json({ message: "Destination created!" });
   } catch (err) {
-    console.error('Add destination error', err);
-    res.status(400).json({ message: 'Error while adding a new destination' });
+    console.error("Add destination error", err);
+    res.status(400).json({ message: "Error while adding a new destination" });
   }
 };
 
@@ -50,17 +50,17 @@ exports.getDestinations = async (req, res) => {
         await Destination.findAndCountAll({
           limit: itemsPerPage,
           offset: skip,
-          order: [['createdAt', 'DESC']],
+          order: [["createdAt", "DESC"]],
           include: [
             {
               model: DestinationType,
-              as: 'destination_types',
-              attributes: ['id', 'type'],
+              as: "destination_types",
+              attributes: ["id", "type"],
             },
             {
               model: DestinationImage,
-              as: 'destination_images',
-              attributes: ['id', 'destination_image'],
+              as: "destination_images",
+              attributes: ["id", "destination_image"],
             },
           ],
           distinct: true,
@@ -72,12 +72,12 @@ exports.getDestinations = async (req, res) => {
     } else {
       const destinations = await Destination.findAll({
         limit: 15,
-        order: [['createdAt', 'DESC']],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: DestinationImage,
-            as: 'destination_images',
-            attributes: ['id', 'destination_image'],
+            as: "destination_images",
+            attributes: ["id", "destination_image"],
           },
         ],
         distinct: true,
@@ -86,8 +86,8 @@ exports.getDestinations = async (req, res) => {
       return res.json(destinations);
     }
   } catch (err) {
-    console.error('Getting destinations error', err);
-    res.status(400).json({ message: 'Error while getting all destinations' });
+    console.error("Getting destinations error", err);
+    res.status(400).json({ message: "Error while getting all destinations" });
   }
 };
 
@@ -151,10 +151,10 @@ exports.editDestination = async (req, res) => {
       await DestinationImage.bulkCreate(newImages);
     }
 
-    res.json({ message: 'Destination updated!' });
+    res.json({ message: "Destination updated!" });
   } catch (err) {
-    console.error('Error editing destination', err);
-    res.status(400).json({ message: 'Error while editing destination' });
+    console.error("Error editing destination", err);
+    res.status(400).json({ message: "Error while editing destination" });
   }
 };
 
@@ -175,9 +175,9 @@ exports.deleteDestination = async (req, res) => {
 
     await Destination.destroy({ where: { id: destination_id } });
 
-    res.json({ message: 'Destination deleted !' });
+    res.json({ message: "Destination deleted !" });
   } catch (err) {
-    console.error('Error deleting destination', err);
-    res.status(400).json({ message: 'Error while deleting destination' });
+    console.error("Error deleting destination", err);
+    res.status(400).json({ message: "Error while deleting destination" });
   }
 };

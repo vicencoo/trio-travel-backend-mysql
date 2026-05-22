@@ -1,88 +1,102 @@
 /** @type {import('sequelize').ModelStatic<any>} */
-const Property = require('./Property');
+const Property = require("./Property");
 /** @type {import('sequelize').ModelStatic<any>} */
-const PropertyImage = require('./PropertyImage');
+const PropertyImage = require("./PropertyImage");
 /** @type {import('sequelize').ModelStatic<any>} */
-const PlaneTicket = require('./PlaneTicket');
+const PlaneTicket = require("./PlaneTicket");
 /** @type {import('sequelize').ModelStatic<any>} */
-const PlaneTicketImage = require('./PlaneTicketImage');
+const PlaneTicketImage = require("./PlaneTicketImage");
 /** @type {import('sequelize').ModelStatic<any>} */
-const Package = require('./TouristPackage');
+const Package = require("./TouristPackage");
 /** @type {import('sequelize').ModelStatic<any>} */
-const PackageImage = require('./TouristPackageImage');
+const PackageImage = require("./TouristPackageImage");
 /** @type {import('sequelize').ModelStatic<any>} */
-const Destination = require('./Destination');
+const Destination = require("./Destination");
 /** @type {import('sequelize').ModelStatic<any>} */
-const DestinationImage = require('./DestinationImage');
+const DestinationImage = require("./DestinationImage");
 /** @type {import('sequelize').ModelStatic<any>} */
-const DestinationType = require('./DestinationType');
+const DestinationType = require("./DestinationType");
 /** @type {import('sequelize').ModelStatic<any>} */
-const User = require('./User');
+const User = require("./User");
 /** @type {import('sequelize').ModelStatic<any>} */
-const RefreshToken = require('./RefreshToken');
+const RefreshToken = require("./RefreshToken");
+/** @type {import('sequelize').ModelStatic<any>} */
+const FlightCompany = require("./FlightCompany");
+/** @type {import('sequelize').ModelStatic<any>} */
+const Booking = require("./Booking");
 
 // Property <--> PropertyImage
-
 Property.hasMany(PropertyImage, {
-  foreignKey: 'property_id',
-  as: 'property_images',
+  foreignKey: "property_id",
+  as: "property_images",
 });
 
 PropertyImage.belongsTo(Property, {
-  foreignKey: 'property_id',
-  as: 'property',
+  foreignKey: "property_id",
+  as: "property",
 });
 
 //PlaneTicket <--> PlaneTicketImage
 PlaneTicket.hasMany(PlaneTicketImage, {
-  foreignKey: 'ticket_id',
-  as: 'ticket_images',
+  foreignKey: "ticket_id",
+  as: "ticket_images",
 });
 
 PlaneTicketImage.belongsTo(PlaneTicket, {
-  foreignKey: 'ticket_id',
-  as: 'planeTicket',
+  foreignKey: "ticket_id",
+  as: "planeTicket",
 });
 
 //Package <--> PackageImage
 Package.hasMany(PackageImage, {
-  foreignKey: 'package_id',
-  as: 'package_images',
+  foreignKey: "package_id",
+  as: "package_images",
 });
 
 PackageImage.belongsTo(Package, {
-  foreignKey: 'package_id',
-  as: 'package',
+  foreignKey: "package_id",
+  as: "package",
 });
 
 // Destination <--> DestinationImage <--> DestinationType
 Destination.hasMany(DestinationImage, {
-  foreignKey: 'destination_id',
-  as: 'destination_images',
+  foreignKey: "destination_id",
+  as: "destination_images",
 });
 Destination.hasMany(DestinationType, {
-  foreignKey: 'destination_id',
-  as: 'destination_types',
+  foreignKey: "destination_id",
+  as: "destination_types",
 });
 
 DestinationImage.belongsTo(Destination, {
-  foreignKey: 'destination_id',
-  as: 'destination',
+  foreignKey: "destination_id",
+  as: "destination",
 });
 DestinationType.belongsTo(Destination, {
-  foreignKey: 'destination_id',
-  as: 'destination',
+  foreignKey: "destination_id",
+  as: "destination",
+});
+
+// Booking <--> FlightCompany
+Booking.belongsTo(FlightCompany, {
+  foreignKey: "flight_company_id",
+  as: "flight_company",
+});
+
+FlightCompany.hasMany(Booking, {
+  foreignKey: "flight_company_id",
+  as: "bookings",
 });
 
 // User <--> Refresh Token
 User.hasMany(RefreshToken, {
-  foreignKey: 'user_id',
-  as: 'refresh_tokens',
+  foreignKey: "user_id",
+  as: "refresh_tokens",
 });
 
 RefreshToken.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'user',
+  foreignKey: "user_id",
+  as: "user",
 });
 
 module.exports = {
@@ -97,4 +111,6 @@ module.exports = {
   DestinationType,
   User,
   RefreshToken,
+  FlightCompany,
+  Booking,
 };

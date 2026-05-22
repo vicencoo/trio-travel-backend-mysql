@@ -1,7 +1,7 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
@@ -16,8 +16,16 @@ exports.sendEmail = async (req, res) => {
     if (!name || !email || !message) {
       return res
         .status(400)
-        .json({ message: 'Name, email and message are required' });
+        .json({ message: "Name, email and message are required" });
     }
+
+    console.log("Before checing");
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      return res.status(500).json({ message: "Email credentials missing" });
+    }
+
+    console.log("After checking");
 
     await transporter.sendMail({
       from: `"${name}" <${process.env.EMAIL_USER}>`,
@@ -28,16 +36,16 @@ exports.sendEmail = async (req, res) => {
         <h3>Mesazh i ri nga Trio Travel.</h3>
         <p><strong>Emri:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Numri i telefonit:</strong> ${phoneNumber || 'Nuk është dhënë'}</p>
+        <p><strong>Numri i telefonit:</strong> ${phoneNumber || "Nuk është dhënë"}</p>
         <hr />
         <p><strong>Mesazhi:</strong></p>
         <p>${message}</p>
       `,
     });
 
-    res.status(200).json({ message: 'Email u dërgua me sukses' });
+    res.status(200).json({ message: "Email u dërgua me sukses" });
   } catch (err) {
-    console.error('Send email error', err);
-    res.status(500).json({ message: 'Error while sending email to agency' });
+    console.error("Send email error", err);
+    res.status(500).json({ message: "Error while sending email to agency" });
   }
 };

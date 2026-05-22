@@ -1,10 +1,17 @@
 /** @type {import('sequelize').ModelStatic<any>} */
-const Booking = require("../models/Booking");
+// const Booking = require("../models/Booking");
+const { FlightCompany, Booking } = require("../models");
 const { Op } = require("sequelize");
 
 exports.addBooking = async (req, res) => {
   try {
-    const { client_name, ticket_date, ticket_code, ticket_price } = req.body;
+    const {
+      client_name,
+      ticket_date,
+      ticket_code,
+      ticket_price,
+      flight_company_id,
+    } = req.body;
     const name = client_name.toLowerCase();
     const code = ticket_code.toLowerCase();
 
@@ -13,6 +20,7 @@ exports.addBooking = async (req, res) => {
       ticket_date,
       ticket_code: code,
       ticket_price: Number(ticket_price),
+      flight_company_id: Number(flight_company_id),
     });
 
     res.json({ message: "Booking saved!" });
@@ -24,7 +32,16 @@ exports.addBooking = async (req, res) => {
 
 exports.getBookings = async (req, res) => {
   try {
-    const bookings = await Booking.findAll({ order: [["createdAt", "DESC"]] });
+    const bookings = await Booking.findAll({
+      include: [
+        {
+          model: FlightCompany,
+          as: "flight_company",
+          attributes: ["id", "flight_company"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
 
     res.json(bookings);
   } catch (err) {
@@ -52,12 +69,20 @@ exports.getCheckinTickets = async (req, res) => {
         where: {
           ticket_date: { [Op.between]: [startOfNextDay, endOfNextDay] },
         },
+        include: [
+          {
+            model: FlightCompany,
+            as: "flight_company",
+            attributes: ["id", "flight_company"],
+          },
+        ],
         order: [["createdAt", "DESC"]],
       });
 
     stats.completedTickets = checkInTickets.filter(
       (item) => item.status === "completed",
     ).length;
+
     stats.pendingTickets = checkInTickets.filter(
       (item) => item.status === "pending",
     ).length;
@@ -100,7 +125,15 @@ exports.bookingToggleStatus = async (req, res) => {
 exports.editBooking = async (req, res) => {
   try {
     const { bookingId } = req.query;
-    const { client_name, ticket_date, ticket_code, ticket_price } = req.body;
+
+    const {
+      client_name,
+      ticket_date,
+      ticket_code,
+      ticket_price,
+      flight_company_id,
+    } = req.body;
+
     const name = client_name.toLowerCase();
     const code = ticket_code.toLowerCase();
 
@@ -115,6 +148,7 @@ exports.editBooking = async (req, res) => {
       ticket_date,
       ticket_code: code,
       ticket_price: Number(ticket_price),
+      flight_company_id: Number(flight_company_id),
     });
 
     res.json({ message: "Booking Updated" });

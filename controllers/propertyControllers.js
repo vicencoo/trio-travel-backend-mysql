@@ -1,6 +1,6 @@
-const { Op } = require('sequelize');
-const { Property, PropertyImage } = require('../models');
-const cloudinary = require('cloudinary');
+const { Op } = require("sequelize");
+const { Property, PropertyImage } = require("../models");
+const cloudinary = require("cloudinary");
 
 exports.addProperty = async (req, res) => {
   try {
@@ -23,7 +23,7 @@ exports.addProperty = async (req, res) => {
       build_year: body.build_year ? Number(body.build_year) : null,
       status: body.status,
       availability: body.availability,
-      publishedAt: body.status === 'active' ? new Date() : null,
+      publishedAt: body.status === "active" ? new Date() : null,
     });
 
     if (propertyImageFiles.length > 0) {
@@ -36,10 +36,10 @@ exports.addProperty = async (req, res) => {
       await PropertyImage.bulkCreate(property_images);
     }
 
-    res.status(201).json({ message: 'Property Created!' });
+    res.status(201).json({ message: "Property Created!" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -50,7 +50,7 @@ exports.getProperties = async (req, res) => {
       page = 1,
       searchQuery,
       listingType,
-      status = 'active',
+      status = "active",
     } = req.query;
     const DEFAULT_LIMIT = 20;
 
@@ -67,14 +67,14 @@ exports.getProperties = async (req, res) => {
       };
     }
 
-    if (listingType && listingType !== 'all') {
+    if (listingType && listingType !== "all") {
       whereCondition = {
         ...whereCondition,
         listing_type: listingType,
       };
     }
 
-    if (status && status !== 'all') {
+    if (status && status !== "all") {
       whereCondition = {
         ...whereCondition,
         status: status,
@@ -92,12 +92,12 @@ exports.getProperties = async (req, res) => {
         where: whereCondition,
         limit: itemsPerPage,
         offset: skip,
-        order: [['publishedAt', 'DESC']],
+        order: [["publishedAt", "DESC"]],
         include: [
           {
             model: PropertyImage,
-            as: 'property_images',
-            attributes: ['id', 'property_image'],
+            as: "property_images",
+            attributes: ["id", "property_image"],
           },
         ],
         distinct: true,
@@ -111,13 +111,13 @@ exports.getProperties = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.getProperty = async (req, res) => {
   try {
-    console.log('REQUEST IS HERE');
+    console.log("REQUEST IS HERE");
 
     const { id } = req.query;
 
@@ -125,19 +125,19 @@ exports.getProperty = async (req, res) => {
       include: [
         {
           model: PropertyImage,
-          as: 'property_images',
-          attributes: ['id', 'property_image'],
+          as: "property_images",
+          attributes: ["id", "property_image"],
         },
       ],
     });
 
     if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
+      return res.status(404).json({ message: "Property not found" });
     }
     res.json(property);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error while getting selected property' });
+    res.status(500).json({ message: "Error while getting selected property" });
   }
 };
 
@@ -148,16 +148,16 @@ exports.renewProperty = async (req, res) => {
     const property = await Property.findByPk(id);
 
     if (!property)
-      return res.status(404).json({ message: 'Property not found!' });
+      return res.status(404).json({ message: "Property not found!" });
 
-    if (property.status === 'draft') return;
+    if (property.status === "draft") return;
 
     await property.update({ publishedAt: new Date() });
 
-    res.json({ message: 'Property Renewed.' });
+    res.json({ message: "Property Renewed." });
   } catch (err) {
-    console.error('Renew property error', err);
-    res.status(400).json({ message: 'Error while renewing a property' });
+    console.error("Renew property error", err);
+    res.status(400).json({ message: "Error while renewing a property" });
   }
 };
 
@@ -167,17 +167,17 @@ exports.publishOrDraft = async (req, res) => {
 
     const property = await Property.findByPk(id);
 
-    if (!property) res.status(404).json({ message: 'Property not found!' });
+    if (!property) res.status(404).json({ message: "Property not found!" });
 
-    let newStatus = '';
-    if (property.status === 'active') {
-      newStatus = 'draft';
+    let newStatus = "";
+    if (property.status === "active") {
+      newStatus = "draft";
       property.publishedAt = null;
-    } else if (property.status === 'draft') {
-      newStatus = 'active';
+    } else if (property.status === "draft") {
+      newStatus = "active";
       property.publishedAt = new Date();
     } else {
-      return res.status(400).json({ message: 'Invalid property status' });
+      return res.status(400).json({ message: "Invalid property status" });
     }
 
     property.status = newStatus;
@@ -187,9 +187,9 @@ exports.publishOrDraft = async (req, res) => {
       .status(200)
       .json({ message: `Property status updated to ${newStatus}` });
   } catch (err) {
-    console.error('Publish Draft error', err);
+    console.error("Publish Draft error", err);
     res.status(400).json({
-      message: 'Something went wrong while drafting or publishing a property',
+      message: "Something went wrong while drafting or publishing a property",
     });
   }
 };
@@ -207,7 +207,7 @@ exports.editProperty = async (req, res) => {
     const property = await Property.findByPk(id);
 
     if (!property) {
-      return res.status(404).json({ message: 'Property not found!' });
+      return res.status(404).json({ message: "Property not found!" });
     }
 
     await property.update({
@@ -227,9 +227,9 @@ exports.editProperty = async (req, res) => {
       status: body.status,
       availability: body.availability,
       publishedAt:
-        body.status === 'active' && !property.publishedAt
+        body.status === "active" && !property.publishedAt
           ? new Date()
-          : body.status === 'draft'
+          : body.status === "draft"
             ? null
             : property.publishedAt,
     });
@@ -272,12 +272,12 @@ exports.editProperty = async (req, res) => {
       await PropertyImage.bulkCreate(newImages);
     }
 
-    return res.json({ message: 'Property updated successfully!' });
+    return res.json({ message: "Property updated successfully!" });
   } catch (err) {
-    console.error('EDIT PROPERTY ERROR:', err.message);
+    console.error("EDIT PROPERTY ERROR:", err.message);
     console.error(err.stack);
     return res.status(500).json({
-      message: err.message || 'Error while editing the property',
+      message: err.message || "Error while editing the property",
     });
   }
 };
@@ -287,11 +287,11 @@ exports.deleteProperty = async (req, res) => {
     const { id } = req.query;
 
     const existingProperty = await Property.findByPk(id, {
-      include: [{ model: PropertyImage, as: 'property_images' }],
+      include: [{ model: PropertyImage, as: "property_images" }],
     });
 
     if (!existingProperty) {
-      return res.status(404).json({ message: 'Property not found!' });
+      return res.status(404).json({ message: "Property not found!" });
     }
 
     await Promise.all(
@@ -306,10 +306,10 @@ exports.deleteProperty = async (req, res) => {
 
     await Property.destroy({ where: { id } });
 
-    res.json({ message: 'Property deleted!' });
+    res.json({ message: "Property deleted!" });
   } catch (err) {
-    console.error('DELETE PROPERTY ERROR:', err.message);
+    console.error("DELETE PROPERTY ERROR:", err.message);
     console.error(err.stack);
-    res.status(500).json({ message: 'Error while deleting property' });
+    res.status(500).json({ message: "Error while deleting property" });
   }
 };

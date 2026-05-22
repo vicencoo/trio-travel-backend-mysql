@@ -179,18 +179,18 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 // app.use((req, res) => {
 //   res.sendFile(path.join(frontendDistPath, "index.html"));
 // });
-// const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 
-// sequelize
-//   .sync()
-//   .then(() => {
-//     app.listen(port);
-//     console.log(`Connected on  port ${port}!`);
+sequelize
+  .sync()
+  .then(() => {
+    app.listen(port);
+    console.log(`Connected on  port ${port}!`);
 
-//     startInsuranceReminder();
-//   })
-//   .catch((err) => {
-//     console.error(err);
-//   });
+    startInsuranceReminder();
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 
 module.exports = app;
