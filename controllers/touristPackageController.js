@@ -1,6 +1,6 @@
-const { Package, PackageImage } = require('../models');
-const { Op } = require('sequelize');
-const cloudinary = require('cloudinary');
+const { Package, PackageImage } = require("../models");
+const { Op } = require("sequelize");
+const cloudinary = require("cloudinary");
 
 exports.addPackage = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ exports.addPackage = async (req, res) => {
       accomodation: body.accomodation,
       meal_included: body.meal_included,
       status: body.status,
-      publishedAt: body.status === 'active' ? new Date() : null,
+      publishedAt: body.status === "active" ? new Date() : null,
     });
 
     if (packageImageFiles.length) {
@@ -29,10 +29,10 @@ exports.addPackage = async (req, res) => {
       await PackageImage.bulkCreate(package_images);
     }
 
-    res.json({ message: 'Tourist Package added successfully!' });
+    res.json({ message: "Tourist Package added successfully!" });
   } catch (err) {
-    console.error('Add package error', err);
-    res.status(400).json({ message: 'Error while adding new tourist package' });
+    console.error("Add package error", err);
+    res.status(400).json({ message: "Error while adding new tourist package" });
   }
 };
 
@@ -42,7 +42,7 @@ exports.getPackages = async (req, res) => {
       packageLimit,
       page = 1,
       searchQuery,
-      status = 'active',
+      status = "active",
     } = req.query;
     const DEFAULT_LIMIT = 20;
 
@@ -58,7 +58,7 @@ exports.getPackages = async (req, res) => {
       };
     }
 
-    if (status && status !== 'all') {
+    if (status && status !== "all") {
       whereCondition = {
         ...whereCondition,
         status: status,
@@ -79,12 +79,17 @@ exports.getPackages = async (req, res) => {
         include: [
           {
             model: PackageImage,
-            as: 'package_images',
-            attributes: ['id', 'image'],
+            as: "package_images",
+            attributes: ["id", "image"],
           },
         ],
+
+        order: [
+          ["published_at", "DESC"],
+          [{ model: PackageImage, as: "package_images" }, "id", "ASC"],
+        ],
         distinct: true,
-        order: [['publishedAt', 'DESC']],
+        order: [["publishedAt", "DESC"]],
       },
     );
     const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -93,8 +98,8 @@ exports.getPackages = async (req, res) => {
 
     res.json({ packages, pagination });
   } catch (err) {
-    console.error('Getting packages error', err);
-    res.status(400).json({ message: 'Error while getting packages' });
+    console.error("Getting packages error", err);
+    res.status(400).json({ message: "Error while getting packages" });
   }
 };
 
@@ -106,16 +111,16 @@ exports.getPackage = async (req, res) => {
       include: [
         {
           model: PackageImage,
-          as: 'package_images',
-          attributes: ['id', 'image'],
+          as: "package_images",
+          attributes: ["id", "image"],
         },
       ],
     });
 
     res.json(package);
   } catch (err) {
-    console.error('Get package error', err);
-    res.status(400).json({ message: 'Error while getting a package' });
+    console.error("Get package error", err);
+    res.status(400).json({ message: "Error while getting a package" });
   }
 };
 
@@ -126,17 +131,17 @@ exports.renewPackage = async (req, res) => {
     const package = await Package.findByPk(packageId);
 
     if (!package) {
-      return res.status(404).json({ message: 'Package not found' });
+      return res.status(404).json({ message: "Package not found" });
     }
 
-    if (package.status === 'draft') return;
+    if (package.status === "draft") return;
 
     await package.update({ publishedAt: new Date() });
 
-    res.json({ message: 'Package renewed' });
+    res.json({ message: "Package renewed" });
   } catch (err) {
-    console.error('Renew package error', err);
-    res.status(400).json({ message: 'Error while renewing package' });
+    console.error("Renew package error", err);
+    res.status(400).json({ message: "Error while renewing package" });
   }
 };
 
@@ -147,29 +152,29 @@ exports.publishOrDraftPackage = async (req, res) => {
     const package = await Package.findByPk(packageId);
 
     if (!package) {
-      return res.status(404).json({ message: 'This package is not found.' });
+      return res.status(404).json({ message: "This package is not found." });
     }
 
-    let newStatus = '';
-    if (package.status === 'active') {
-      newStatus = 'draft';
+    let newStatus = "";
+    if (package.status === "active") {
+      newStatus = "draft";
       package.publishedAt = null;
-    } else if (package.status === 'draft') {
-      newStatus = 'active';
+    } else if (package.status === "draft") {
+      newStatus = "active";
       package.publishedAt = new Date();
     } else {
-      return res.status(400).json({ message: 'Invalid package status' });
+      return res.status(400).json({ message: "Invalid package status" });
     }
 
     package.status = newStatus;
     await package.save();
 
-    res.json({ message: 'Package status updated' });
+    res.json({ message: "Package status updated" });
   } catch (err) {
-    console.error('Publish or draft package error', err);
+    console.error("Publish or draft package error", err);
     res
       .status(400)
-      .json({ message: 'Error while publishing or drafting a package' });
+      .json({ message: "Error while publishing or drafting a package" });
   }
 };
 
@@ -185,7 +190,7 @@ exports.editPackage = async (req, res) => {
     const package = await Package.findByPk(packageId);
 
     if (!package)
-      return res.status(404).json({ message: 'No package found to edit' });
+      return res.status(404).json({ message: "No package found to edit" });
 
     await package.update({
       title: body.title,
@@ -196,7 +201,7 @@ exports.editPackage = async (req, res) => {
       accomodation: body.accomodation,
       meal_included: body.meal_included,
       status: body.status,
-      publishedAt: body.status === 'draft' ? null : package.createdAt,
+      publishedAt: body.status === "draft" ? null : package.createdAt,
     });
 
     if (deletedImgs.length) {
@@ -231,10 +236,10 @@ exports.editPackage = async (req, res) => {
       await PackageImage.bulkCreate(newImages);
     }
 
-    res.json({ message: 'Package updated successfully!' });
+    res.json({ message: "Package updated successfully!" });
   } catch (err) {
-    console.error('Editing package error', err);
-    res.status(400).json({ message: 'Error while editing package' });
+    console.error("Editing package error", err);
+    res.status(400).json({ message: "Error while editing package" });
   }
 };
 
@@ -243,11 +248,11 @@ exports.deletePackage = async (req, res) => {
     const { packageId } = req.query;
 
     const package = await Package.findByPk(packageId, {
-      include: [{ model: PackageImage, as: 'package_images' }],
+      include: [{ model: PackageImage, as: "package_images" }],
     });
 
     if (!package) {
-      return res.status(404).json({ message: 'Package not found' });
+      return res.status(404).json({ message: "Package not found" });
     }
 
     await Promise.all(
@@ -262,9 +267,9 @@ exports.deletePackage = async (req, res) => {
 
     await Package.destroy({ where: { id: packageId } });
 
-    res.json({ message: 'Package deleted' });
+    res.json({ message: "Package deleted" });
   } catch (err) {
-    console.error('Deleting package error', err);
-    res.status(400).json({ message: 'Error while deleting package' });
+    console.error("Deleting package error", err);
+    res.status(400).json({ message: "Error while deleting package" });
   }
 };
