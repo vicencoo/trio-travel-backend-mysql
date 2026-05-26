@@ -25,6 +25,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const insuranceRoutes = require("./routes/insuranceRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const flightCompaniesRoutes = require("./routes/flightCompanyRoutes");
+const shareRoutes = require("./routes/shareRoutes");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -69,116 +70,10 @@ app.use(dashboardRoutes);
 app.use(insuranceRoutes);
 app.use(contactRoutes);
 app.use(flightCompaniesRoutes);
+app.use(shareRoutes);
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-// function escapeHtml(value = "") {
-//   return String(value)
-//     .replace(/&/g, "&amp;")
-//     .replace(/"/g, "&quot;")
-//     .replace(/</g, "&lt;")
-//     .replace(/>/g, "&gt;");
-// }
-
-// /* OG TAG INJECTOR */
-// function injectOgData(html, data) {
-//   return html
-//     .replace(/__OG_TITLE__/g, escapeHtml(data.title))
-//     .replace(/__OG_DESCRIPTION__/g, escapeHtml(data.description))
-//     .replace(/__OG_IMAGE__/g, escapeHtml(data.image))
-//     .replace(/__OG_URL__/g, escapeHtml(data.url));
-// }
-
-// /* PROPERTY SHARE */
-// app.get("/pronat/:slug", async (req, res) => {
-//   try {
-//     const property = await Property.findOne({
-//       where: { slug: req.params.slug },
-//     });
-
-//     const htmlPath = path.join(frontendDistPath, "index.html");
-
-//     let html = fs.readFileSync(htmlPath, "utf8");
-
-//     if (!property) {
-//       return res.sendFile(htmlPath);
-//     }
-
-//     const image =
-//       property.images?.[0]?.url ||
-//       property.images?.[0] ||
-//       property.property_images?.[0]?.url ||
-//       property.property_images?.[0] ||
-//       "https://www.triotravel.al/images/trio-travel-icon.webp";
-
-//     const title = property.title || property.name || "Trio Travel Agency";
-
-//     const description =
-//       property.description?.replace(/<[^>]*>/g, "")?.slice(0, 160) ||
-//       "Discover this property from Trio Travel Agency.";
-
-//     html = injectOgData(html, {
-//       title,
-//       description,
-//       image,
-//       url: `https://www.triotravel.al/pronat/${property.slug}`,
-//     });
-
-//     return res.send(html);
-//   } catch (err) {
-//     console.error(err);
-//     return res.sendFile(path.join(frontendDistPath, "index.html"));
-//   }
-// });
-
-// /* PACKAGE SHARE */
-// app.get("/paketat/:slug", async (req, res) => {
-//   try {
-//     const touristPackage = await TouristPackage.findOne({
-//       where: { slug: req.params.slug },
-//     });
-
-//     const htmlPath = path.join(frontendDistPath, "index.html");
-
-//     let html = fs.readFileSync(htmlPath, "utf8");
-
-//     if (!touristPackage) {
-//       return res.sendFile(htmlPath);
-//     }
-
-//     const image =
-//       touristPackage.images?.[0]?.url ||
-//       touristPackage.images?.[0] ||
-//       touristPackage.package_images?.[0]?.url ||
-//       touristPackage.package_images?.[0] ||
-//       "https://www.triotravel.al/images/trio-travel-icon.webp";
-
-//     const title =
-//       touristPackage.title || touristPackage.name || "Trio Travel Agency";
-
-//     const description =
-//       touristPackage.description?.replace(/<[^>]*>/g, "")?.slice(0, 160) ||
-//       "Discover this package from Trio Travel Agency.";
-
-//     html = injectOgData(html, {
-//       title,
-//       description,
-//       image,
-//       url: `https://www.triotravel.al/paketat/${touristPackage.slug}`,
-//     });
-
-//     return res.send(html);
-//   } catch (err) {
-//     console.error(err);
-//     return res.sendFile(path.join(frontendDistPath, "index.html"));
-//   }
-// });
-
-// app.use(express.static(frontendDistPath));
-
-// app.use((req, res) => {
-//   res.sendFile(path.join(frontendDistPath, "index.html"));
-// });
 const port = process.env.PORT || 8000;
 
 sequelize

@@ -54,6 +54,8 @@ exports.getProperties = async (req, res) => {
     } = req.query;
     const DEFAULT_LIMIT = 20;
 
+    console.log("Req here!!");
+
     let whereCondition = {};
     if (searchQuery) {
       whereCondition = {
