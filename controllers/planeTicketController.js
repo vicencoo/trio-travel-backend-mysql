@@ -1,6 +1,6 @@
-const { PlaneTicket, PlaneTicketImage } = require('../models');
-const { Op } = require('sequelize');
-const cloudinary = require('cloudinary');
+const { PlaneTicket, PlaneTicketImage } = require("../models");
+const { Op } = require("sequelize");
+const cloudinary = require("cloudinary");
 
 exports.addPlaneTicket = async (req, res) => {
   try {
@@ -8,10 +8,10 @@ exports.addPlaneTicket = async (req, res) => {
     const ticketImageFiles = req.files;
 
     const planeTicket = await PlaneTicket.create({
-      from: body.from,
-      to: body.to,
-      departure_airport: body.departure_airport,
-      arrival_airport: body.arrival_airport,
+      from: body.from.toLowerCase(),
+      to: body.to.toLowerCase(),
+      departure_airport: body.departure_airport.toLowerCase(),
+      arrival_airport: body.arrival_airport.toLowerCase(),
       price: Number(body.price),
     });
 
@@ -25,10 +25,10 @@ exports.addPlaneTicket = async (req, res) => {
       await PlaneTicketImage.bulkCreate(ticket_images);
     }
 
-    res.json({ message: 'Plane Ticket added!' });
+    res.json({ message: "Plane Ticket added!" });
   } catch (err) {
-    console.error('Add plane ticket error', err);
-    res.status(400).json({ message: 'Error while adding new plane ticket' });
+    console.error("Add plane ticket error", err);
+    res.status(400).json({ message: "Error while adding new plane ticket" });
   }
 };
 
@@ -62,12 +62,12 @@ exports.getTickets = async (req, res) => {
         include: [
           {
             model: PlaneTicketImage,
-            as: 'ticket_images',
-            attributes: ['id', 'image'],
+            as: "ticket_images",
+            attributes: ["id", "image"],
           },
         ],
         distinct: true,
-        order: [['createdAt', 'DESC']],
+        order: [["createdAt", "DESC"]],
       });
     } else {
       data.tickets = await PlaneTicket.findAll({
@@ -75,11 +75,11 @@ exports.getTickets = async (req, res) => {
         include: [
           {
             model: PlaneTicketImage,
-            as: 'ticket_images',
-            attributes: ['id', 'image'],
+            as: "ticket_images",
+            attributes: ["id", "image"],
           },
         ],
-        order: [['createdAt', 'DESC']],
+        order: [["createdAt", "DESC"]],
       });
     }
 
@@ -95,8 +95,8 @@ exports.getTickets = async (req, res) => {
 
     res.json(data);
   } catch (err) {
-    console.error('Error getting all tickets', err);
-    res.status(400).json({ message: 'Error while getting all tickets' });
+    console.error("Error getting all tickets", err);
+    res.status(400).json({ message: "Error while getting all tickets" });
   }
 };
 
@@ -109,10 +109,10 @@ exports.editTicket = async (req, res) => {
     const planeTicket = await PlaneTicket.findByPk(ticketId);
 
     await planeTicket.update({
-      from: body.from,
-      to: body.to,
-      departure_airport: body.departure_airport,
-      arrival_airport: body.arrival_airport,
+      from: body.from.toLowerCase(),
+      to: body.to.toLowerCase(),
+      departure_airport: body.departure_airport.toLowerCase(),
+      arrival_airport: body.arrival_airport.toLowerCase(),
       price: Number(body.price),
     });
 
@@ -139,10 +139,10 @@ exports.editTicket = async (req, res) => {
       await PlaneTicketImage.bulkCreate(ticket_images);
     }
 
-    res.json({ message: 'Plane ticket updated' });
+    res.json({ message: "Plane ticket updated" });
   } catch (err) {
-    console.error('Edit ticket error', err);
-    res.status(400).json({ message: 'Error while editing the plane ticket' });
+    console.error("Edit ticket error", err);
+    res.status(400).json({ message: "Error while editing the plane ticket" });
   }
 };
 
@@ -151,11 +151,11 @@ exports.deleteTicket = async (req, res) => {
     const { ticketId } = req.query;
 
     const planeTicket = await PlaneTicket.findByPk(ticketId, {
-      include: [{ model: PlaneTicketImage, as: 'ticket_images' }],
+      include: [{ model: PlaneTicketImage, as: "ticket_images" }],
     });
 
     if (!planeTicket)
-      return res.status(404).json({ message: 'No plane ticket was found' });
+      return res.status(404).json({ message: "No plane ticket was found" });
 
     await Promise.all(
       planeTicket.ticket_images.map(async (image) => {
@@ -168,9 +168,9 @@ exports.deleteTicket = async (req, res) => {
     await PlaneTicketImage.destroy({ where: { ticket_id: ticketId } });
     await PlaneTicket.destroy({ where: { id: ticketId } });
 
-    res.json({ message: 'Plane ticket deleted' });
+    res.json({ message: "Plane ticket deleted" });
   } catch (err) {
-    console.error('Ticket deletion error', err);
-    res.status(400).json({ message: 'Error while deleting ticket' });
+    console.error("Ticket deletion error", err);
+    res.status(400).json({ message: "Error while deleting ticket" });
   }
 };

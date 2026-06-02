@@ -24,22 +24,6 @@ exports.shareProperty = async (req, res) => {
 
     const frontendUrl = `https://www.triotravel.al/pronat/${slug}`;
 
-    // res.send(`
-    //   <!doctype html>
-    //   <html>
-    //     <head>
-    //       <title>${property.title}</title>
-    //       <meta property="og:title" content="${property.title}" />
-    //       <meta property="og:description" content="${property.city}, Shqipëri - ${property.price}€" />
-    //       <meta property="og:image" content="${firstImage}" />
-    //       <meta property="og:url" content="${frontendUrl}" />
-    //       <meta property="og:type" content="website" />
-    //       <meta name="twitter:card" content="summary_large_image" />
-    //       <meta http-equiv="refresh" content="0;url=${frontendUrl}" />
-    //     </head>
-    //     <body>Redirecting...</body>
-    //   </html>
-    // `);
     res.send(`
   <!doctype html>
   <html>

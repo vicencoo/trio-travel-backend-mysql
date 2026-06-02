@@ -12,10 +12,11 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ message: "Wrong credentials" });
+    if (!user) return res.status(404).json({ message: "Wrong credentials!" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Wrong credentials" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Wrong credentials!" });
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
