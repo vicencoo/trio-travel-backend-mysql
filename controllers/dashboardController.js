@@ -3,11 +3,11 @@ const {
   Package,
   PlaneTicket,
   Destination,
-} = require('../models/index');
+} = require("../models/index");
 /** @type {import('sequelize').ModelStatic<any>} */
-const Booking = require('../models/Booking');
-const getDateRanges = require('../utils/dateRanges');
-const { fn, col, literal, Op } = require('sequelize');
+const Booking = require("../models/Booking");
+const getDateRanges = require("../utils/dateRanges");
+const { fn, col, literal, Op } = require("sequelize");
 
 exports.getDataCounts = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ exports.getDataCounts = async (req, res) => {
       getDateRanges();
 
     const models = [Property, PlaneTicket, Package, Destination];
-    const keys = ['pronat', 'biletat', 'paketat', 'destinacionet'];
+    const keys = ["pronat", "biletat", "paketat", "destinacionet"];
 
     const currentCount = (Model) =>
       Model.count({
@@ -51,8 +51,8 @@ exports.getDataCounts = async (req, res) => {
 
     res.json({ dataCounts: data });
   } catch (err) {
-    console.error('Getting dashboard error', err);
-    res.status(400).json({ message: 'Error while getting dashboard data' });
+    console.error("Getting dashboard error", err);
+    res.status(400).json({ message: "Error while getting dashboard data" });
   }
 };
 
@@ -157,15 +157,15 @@ exports.analytics = async (req, res) => {
       59,
     );
 
-    const dateColumn = 'ticket_date'; // or 'created_at' if that column really exists and is what you want
+    const dateColumn = "ticket_date";
 
     const [monthlyRevenue, dailyTickets, monthlyTickets, ticketStatus] =
       await Promise.all([
         Booking.findAll({
           attributes: [
-            [literal(`TO_CHAR("${dateColumn}", 'Mon')`), 'month'],
-            [literal(`EXTRACT(MONTH FROM "${dateColumn}")`), 'month_num'],
-            [fn('ROUND', fn('SUM', col('ticket_price')), 2), 'revenue'],
+            [literal(`TO_CHAR("${dateColumn}", 'Mon')`), "month"],
+            [literal(`EXTRACT(MONTH FROM "${dateColumn}")`), "month_num"],
+            [fn("ROUND", fn("SUM", col("ticket_price")), 2), "revenue"],
           ],
           where: {
             [dateColumn]: { [Op.not]: null },
@@ -174,14 +174,14 @@ exports.analytics = async (req, res) => {
             literal(`EXTRACT(MONTH FROM "${dateColumn}")`),
             literal(`TO_CHAR("${dateColumn}", 'Mon')`),
           ],
-          order: [[literal('month_num'), 'ASC']],
+          order: [[literal("month_num"), "ASC"]],
           raw: true,
         }),
 
         Booking.findAll({
           attributes: [
-            [literal(`TO_CHAR("${dateColumn}", 'Mon DD')`), 'day'],
-            [fn('COUNT', col('id')), 'tickets'],
+            [literal(`TO_CHAR("${dateColumn}", 'Mon DD')`), "day"],
+            [fn("COUNT", col("id")), "tickets"],
           ],
           where: {
             [dateColumn]: {
@@ -193,15 +193,15 @@ exports.analytics = async (req, res) => {
             literal(`DATE("${dateColumn}")`),
             literal(`TO_CHAR("${dateColumn}", 'Mon DD')`),
           ],
-          order: [[literal(`DATE("${dateColumn}")`), 'ASC']],
+          order: [[literal(`DATE("${dateColumn}")`), "ASC"]],
           raw: true,
         }),
 
         Booking.findAll({
           attributes: [
-            [literal(`TO_CHAR("${dateColumn}", 'Mon')`), 'month'],
-            [literal(`EXTRACT(MONTH FROM "${dateColumn}")`), 'month_num'],
-            [fn('COUNT', col('id')), 'tickets'],
+            [literal(`TO_CHAR("${dateColumn}", 'Mon')`), "month"],
+            [literal(`EXTRACT(MONTH FROM "${dateColumn}")`), "month_num"],
+            [fn("COUNT", col("id")), "tickets"],
           ],
           where: {
             [dateColumn]: { [Op.not]: null },
@@ -210,25 +210,25 @@ exports.analytics = async (req, res) => {
             literal(`EXTRACT(MONTH FROM "${dateColumn}")`),
             literal(`TO_CHAR("${dateColumn}", 'Mon')`),
           ],
-          order: [[literal('month_num'), 'ASC']],
+          order: [[literal("month_num"), "ASC"]],
           raw: true,
         }),
 
         Booking.findAll({
           attributes: [
-            ['status', 'name'],
-            [fn('COUNT', col('id')), 'value'],
+            ["status", "name"],
+            [fn("COUNT", col("id")), "value"],
           ],
           where: { status: { [Op.not]: null } },
-          group: ['status'],
+          group: ["status"],
           raw: true,
         }),
       ]);
 
     res.json({ monthlyRevenue, dailyTickets, monthlyTickets, ticketStatus });
   } catch (error) {
-    console.error('Analytics error message:', error.message);
-    console.error('Analytics full error:', error);
-    res.status(500).json({ error: 'Failed to fetch analytics' });
+    console.error("Analytics error message:", error.message);
+    console.error("Analytics full error:", error);
+    res.status(500).json({ error: "Failed to fetch analytics" });
   }
 };

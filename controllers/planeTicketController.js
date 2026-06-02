@@ -35,7 +35,7 @@ exports.addPlaneTicket = async (req, res) => {
 exports.getTickets = async (req, res) => {
   try {
     const { limit, page = 1, searchQuery } = req.query;
-    const DEFAULT_LIMIT = 20;
+    const DEFAULT_LIMIT = 200;
     const data = {};
 
     let whereCondition = {};

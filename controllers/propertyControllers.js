@@ -89,22 +89,6 @@ exports.getProperties = async (req, res) => {
     );
     const skip = (page - 1) * itemsPerPage;
 
-    // const { rows: properties, count: totalProducts } =
-    //   await Property.findAndCountAll({
-    //     where: whereCondition,
-    //     limit: itemsPerPage,
-    //     offset: skip,
-    //     order: [["publishedAt", "DESC"]],
-    //     include: [
-    //       {
-    //         model: PropertyImage,
-    //         as: "property_images",
-    //         attributes: ["id", "property_image"],
-    //       },
-    //     ],
-    //     distinct: true,
-    //   });
-
     const { rows: properties, count: totalProducts } =
       await Property.findAndCountAll({
         where: whereCondition,
