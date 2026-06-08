@@ -1,4 +1,5 @@
 const { Property, PropertyImage, Package, PackageImage } = require("../models");
+const renderShareHtml = require("../utils/renderShareHtml");
 
 exports.shareProperty = async (req, res) => {
   try {
@@ -24,31 +25,40 @@ exports.shareProperty = async (req, res) => {
 
     const frontendUrl = `https://www.triotravel.al/pronat/${slug}`;
 
-    res.send(`
-  <!doctype html>
-  <html>
-    <head>
-      <title>${property.title}</title>
+    return res.send(
+      renderShareHtml({
+        title: property.title,
+        description: `${property.city}, Shqipëri - ${property.price}€`,
+        image: firstImage,
+        url: frontendUrl,
+      }),
+    );
 
-      <meta property="og:title" content="${property.title}" />
-      <meta property="og:description" content="${property.city}, Shqipëri - ${property.price}€" />
-      <meta property="og:image" content="${firstImage}" />
-      <meta property="og:image:secure_url" content="${firstImage}" />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content="${frontendUrl}" />
+    //     res.send(`
+    //   <!doctype html>
+    //   <html>
+    //     <head>
+    //       <title>${property.title}</title>
 
-      <meta name="twitter:card" content="summary_large_image" />
-    </head>
+    //       <meta property="og:title" content="${property.title}" />
+    //       <meta property="og:description" content="${property.city}, Shqipëri - ${property.price}€" />
+    //       <meta property="og:image" content="${firstImage}" />
+    //       <meta property="og:image:secure_url" content="${firstImage}" />
+    //       <meta property="og:image:width" content="1200" />
+    //       <meta property="og:image:height" content="630" />
+    //       <meta property="og:type" content="website" />
+    //       <meta property="og:url" content="${frontendUrl}" />
 
-    <body>
-      <script>
-        window.location.href = "${frontendUrl}";
-      </script>
-    </body>
-  </html>
-`);
+    //       <meta name="twitter:card" content="summary_large_image" />
+    //     </head>
+
+    //     <body>
+    //       <script>
+    //         window.location.href = "${frontendUrl}";
+    //       </script>
+    //     </body>
+    //   </html>
+    // `);
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
@@ -81,22 +91,39 @@ exports.sharePackage = async (req, res) => {
 
     const frontendUrl = `https://www.triotravel.al/paketa-turistike/${slug}`;
 
-    res.send(`
-      <!doctype html>
-      <html>
-        <head>
-          <title>${touristPackage.title}</title>
-          <meta property="og:title" content="${touristPackage.title}" />
-          <meta property="og:description" content="${touristPackage.destination || "Trio Travel Agency"}" />
-          <meta property="og:image" content="${firstImage}" />
-          <meta property="og:url" content="${frontendUrl}" />
-          <meta property="og:type" content="website" />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta http-equiv="refresh" content="0;url=${frontendUrl}" />
-        </head>
-        <body>Redirecting...</body>
-      </html>
-    `);
+    // res.send(`
+    // <!doctype html>
+    // <html>
+    //   <head>
+    //     <title>${touristPackage.title}</title>
+
+    //     <meta property="og:title" content="${touristPackage.title}" />
+    //     <meta property="og:description" content="${touristPackage.destination || "Trio Travel Agency"}" />
+    //     <meta property="og:image" content="${firstImage}" />
+    //     <meta property="og:image:secure_url" content="${firstImage}" />
+    //     <meta property="og:image:width" content="1200" />
+    //     <meta property="og:image:height" content="630" />
+    //     <meta property="og:url" content="${frontendUrl}" />
+    //     <meta property="og:type" content="website" />
+
+    //     <meta name="twitter:card" content="summary_large_image" />
+    //   </head>
+
+    //   <body>
+    //     <script>
+    //       window.location.href = "${frontendUrl}";
+    //     </script>
+    //   </body>
+    // </html>
+    // `);
+    return res.send(
+      renderShareHtml({
+        title: touristPackage.title,
+        description: touristPackage.destination || "Trio Travel Agency",
+        image: firstImage,
+        url: frontendUrl,
+      }),
+    );
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
