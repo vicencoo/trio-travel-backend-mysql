@@ -1,4 +1,4 @@
-const renderShareHtml = ({ title, description, image, url }) => `
+const renderShareHtml = ({ title, description, image, url, redirectUrl }) => `
 <!doctype html>
 <html>
   <head>
@@ -14,10 +14,13 @@ const renderShareHtml = ({ title, description, image, url }) => `
     <meta property="og:url" content="${url}" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta http-equiv="refresh" content="0;url=${url}" />
   </head>
 
-  <body>Redirecting...</body>
+  <body>
+    <script>
+      window.location.href = "${redirectUrl}";
+    </script>
+  </body>
 </html>
 `;
 
