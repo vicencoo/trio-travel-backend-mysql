@@ -50,4 +50,6 @@ router.post(
   touristPackageController.deletePackage,
 );
 
+router.get("/turkey-packages", touristPackageController.getTurkeyPackages);
+
 module.exports = router;

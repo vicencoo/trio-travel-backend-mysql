@@ -8,8 +8,8 @@ exports.addPackage = async (req, res) => {
     const packageImageFiles = req.files;
 
     const package = await Package.create({
-      title: body.title,
-      destination: body.destination,
+      title: body.title.toLowerCase(),
+      destination: body.destination.toLowerCase(),
       price: Number(body.price),
       duration: Number(body.duration),
       description: body.description,
@@ -86,10 +86,10 @@ exports.getPackages = async (req, res) => {
 
         order: [
           ["published_at", "DESC"],
-          [{ model: PackageImage, as: "package_images" }, "id", "ASC"],
+          [{ model: PackageImage, as: "package_images" }, "id", "DESC"],
         ],
         distinct: true,
-        order: [["publishedAt", "DESC"]],
+        // order: [["publishedAt", "DESC"]],
       },
     );
     const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -100,6 +100,127 @@ exports.getPackages = async (req, res) => {
   } catch (err) {
     console.error("Getting packages error", err);
     res.status(400).json({ message: "Error while getting packages" });
+  }
+};
+
+exports.getTurkeyPackages = async (req, res) => {
+  try {
+    const {
+      packageLimit,
+      page = 1,
+      searchQuery,
+      status = "active",
+    } = req.query;
+
+    const DEFAULT_LIMIT = 20;
+
+    const turkeyKeywords = [
+      "turkey",
+      "turqi",
+      "turqia",
+      "türkiye",
+      "turkiye",
+
+      "antalya",
+      "antalya turkey",
+      "antalya, turkey",
+      "antalya turqi",
+      "antalya, turqi",
+
+      "istanbul",
+      "instambul",
+      "stamboll",
+      "stambol",
+      "stambul",
+
+      "bodrum",
+      "marmaris",
+      "kusadasi",
+      "kuşadası",
+      "alanya",
+      "side",
+      "belek",
+      "kemer",
+      "izmir",
+      "ankara",
+      "cappadocia",
+      "kapadokya",
+      "pamukkale",
+    ];
+
+    let whereCondition = {
+      [Op.or]: turkeyKeywords.flatMap((keyword) => [
+        { title: { [Op.like]: `%${keyword}%` } },
+        { destination: { [Op.like]: `%${keyword}%` } },
+        { description: { [Op.like]: `%${keyword}%` } },
+      ]),
+    };
+
+    if (searchQuery) {
+      whereCondition = {
+        [Op.and]: [
+          whereCondition,
+          {
+            [Op.or]: [
+              { title: { [Op.like]: `%${searchQuery}%` } },
+              { destination: { [Op.like]: `%${searchQuery}%` } },
+              { description: { [Op.like]: `%${searchQuery}%` } },
+            ],
+          },
+        ],
+      };
+    }
+
+    if (status && status !== "all") {
+      whereCondition = {
+        [Op.and]: [whereCondition, { status }],
+      };
+    }
+
+    const itemsPerPage = Math.min(
+      Number(packageLimit) || DEFAULT_LIMIT,
+      DEFAULT_LIMIT,
+    );
+
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const skip = (currentPage - 1) * itemsPerPage;
+
+    const { rows: packages, count: totalCount } = await Package.findAndCountAll(
+      {
+        where: whereCondition,
+        limit: itemsPerPage,
+        offset: skip,
+        include: [
+          {
+            model: PackageImage,
+            as: "package_images",
+            attributes: ["id", "image"],
+          },
+        ],
+        order: [
+          ["publishedAt", "DESC"],
+          [{ model: PackageImage, as: "package_images" }, "id", "ASC"],
+        ],
+        distinct: true,
+      },
+    );
+
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+    res.json({
+      packages,
+      pagination: {
+        totalPages,
+        totalPackages: totalCount,
+        currentPage,
+        itemsPerPage,
+      },
+    });
+  } catch (err) {
+    console.error("Getting Turkey packages error", err);
+    res.status(400).json({
+      message: "Error while getting Turkey packages",
+    });
   }
 };
 
@@ -193,8 +314,8 @@ exports.editPackage = async (req, res) => {
       return res.status(404).json({ message: "No package found to edit" });
 
     await package.update({
-      title: body.title,
-      destination: body.destination,
+      title: body.title.toLowerCase(),
+      destination: body.destination.toLowerCase(),
       price: Number(body.price),
       duration: Number(body.duration),
       description: body.description,
