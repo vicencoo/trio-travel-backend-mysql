@@ -46,14 +46,16 @@ exports.getPackages = async (req, res) => {
     } = req.query;
     const DEFAULT_LIMIT = 20;
 
+    const search = searchQuery?.trim().toLowerCase();
+
     let whereCondition = {};
 
-    if (searchQuery) {
+    if (search) {
       whereCondition = {
         [Op.or]: [
-          { title: { [Op.like]: `%${searchQuery}%` } },
-          { destination: { [Op.like]: `%${searchQuery}%` } },
-          { description: { [Op.like]: `%${searchQuery}%` } },
+          { title: { [Op.like]: `%${search}%` } },
+          { destination: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } },
         ],
       };
     }
@@ -89,7 +91,6 @@ exports.getPackages = async (req, res) => {
           [{ model: PackageImage, as: "package_images" }, "id", "DESC"],
         ],
         distinct: true,
-        // order: [["publishedAt", "DESC"]],
       },
     );
     const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -113,6 +114,8 @@ exports.getTurkeyPackages = async (req, res) => {
     } = req.query;
 
     const DEFAULT_LIMIT = 20;
+
+    const search = searchQuery?.trim().toLowerCase();
 
     const turkeyKeywords = [
       "turkey",
@@ -156,15 +159,15 @@ exports.getTurkeyPackages = async (req, res) => {
       ]),
     };
 
-    if (searchQuery) {
+    if (search) {
       whereCondition = {
         [Op.and]: [
           whereCondition,
           {
             [Op.or]: [
-              { title: { [Op.like]: `%${searchQuery}%` } },
-              { destination: { [Op.like]: `%${searchQuery}%` } },
-              { description: { [Op.like]: `%${searchQuery}%` } },
+              { title: { [Op.like]: `%${search}%` } },
+              { destination: { [Op.like]: `%${search}%` } },
+              { description: { [Op.like]: `%${search}%` } },
             ],
           },
         ],
