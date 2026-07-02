@@ -7,6 +7,7 @@ const path = require("path");
 const app = express();
 const cookieParser = require("cookie-parser");
 const fs = require("fs");
+
 /* IMPORT YOUR MODELS */
 const Property = require("./models/Property");
 const TouristPackage = require("./models/TouristPackage");
@@ -30,18 +31,7 @@ const shareRoutes = require("./routes/shareRoutes");
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-// app.use(
-//   cors({
-//     origin: process.env.REQUEST_ORIGIN,
-//     // origin: process.env.REQUEST_ORIGIN_NETWORK,
-//     credentials: true,
-//   }),
-// );
-// const allowedOrigins = [
-//   process.env.REQUEST_ORIGIN,
-//   process.env.REQUEST_ORIGIN_WWW,
-//   process.env.REQUEST_ORIGIN_LOCAL,
-// ].filter(Boolean);
+
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",").map((origin) =>
   origin.trim(),
 );

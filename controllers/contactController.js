@@ -12,7 +12,6 @@ exports.sendEmail = async (req, res) => {
   try {
     const { name, email, phoneNumber, message } = req.body;
 
-    // Basic validation
     if (!name || !email || !message) {
       return res
         .status(400)

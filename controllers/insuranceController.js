@@ -77,14 +77,6 @@ exports.getExpiringInsurances = async (req, res) => {
       };
     }
 
-    // if (query) {
-    //   whereCondition = {
-    //     [Op.or]: [
-    //       { client_name: { [Op.like]: `%${query}%` } },
-    //       { car_plate: { [Op.like]: `%${query}%` } },
-    //     ],
-    //   };
-    // }
     if (query) {
       whereCondition[Op.or] = [
         { client_name: { [Op.like]: `%${query}%` } },

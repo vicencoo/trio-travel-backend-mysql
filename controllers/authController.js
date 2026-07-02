@@ -27,8 +27,6 @@ exports.login = async (req, res) => {
     // Send refresh token in HttpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      // secure: false,
-      // sameSite: 'lax',
       secure: isProduction, // MUST be true in production
       sameSite: isProduction ? "none" : "lax",
       maxAge: 30 * 24 * 60 * 60 * 1000,

@@ -1,30 +1,26 @@
 /** @type {import('sequelize').ModelStatic<any>} */
-const Insurance = require('../models/Insurance');
-// const cron = require('node-cron');
-// const { Op } = require('sequelize');
-const sendEmail = require('./sendEmail');
+const Insurance = require("../models/Insurance");
+const { Op } = require("sequelize");
+const sendEmail = require("./sendEmail");
 
-// const startInsuranceReminder = () => {
-//   // cron.schedule('* 10 * * *', async () => {
-//   cron.schedule('54 13 * * *', async () => {
-//     const today = new Date();
-
-//     const reminderDate = new Date();
-//     reminderDate.setDate(today.getDate() + 7);
-
-//     const expiring = await Insurance.findAll({
-//       where: { expiration_date: reminderDate },
-//     });
-
-//     if (expiring.length === 0) return;
 const runInsuranceReminder = async () => {
   const today = new Date();
 
-  const reminderDate = new Date();
+  const reminderDate = new Date(today);
   reminderDate.setDate(today.getDate() + 7);
 
+  const startOfDay = new Date(reminderDate);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(reminderDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
   const expiring = await Insurance.findAll({
-    where: { expiration_date: reminderDate },
+    where: {
+      expiration_date: {
+        [Op.between]: [startOfDay, endOfDay],
+      },
+    },
   });
 
   if (expiring.length === 0) return;
@@ -32,11 +28,11 @@ const runInsuranceReminder = async () => {
   const rows = expiring
     .map((exp) => {
       const name = exp.client_name
-        .split(' ')
+        .split(" ")
         .map(
           (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
         )
-        .join(' ');
+        .join(" ");
       const plate = exp.car_plate.toUpperCase();
 
       return `<tr>
@@ -45,7 +41,7 @@ const runInsuranceReminder = async () => {
             <td>${plate}</td>
           </tr>`;
     })
-    .join('');
+    .join("");
 
   const htmlMessage = `
       <h2>Përshëndetje Alesia,</h2>
@@ -67,7 +63,7 @@ const runInsuranceReminder = async () => {
     `;
 
   await sendEmail(
-    'triotravel.imobiliare@gmail.com',
+    "triotravel.imobiliare@gmail.com",
     `Rikujtim: ${expiring.length} siguracione që skadojnë pas 7 ditësh`,
     htmlMessage,
   );
