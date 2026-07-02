@@ -88,7 +88,7 @@ exports.getPackages = async (req, res) => {
 
         order: [
           ["published_at", "DESC"],
-          [{ model: PackageImage, as: "package_images" }, "id", "DESC"],
+          [{ model: PackageImage, as: "package_images" }, "id", "ASC"],
         ],
         distinct: true,
       },
