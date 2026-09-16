@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/insurance-reminder",
-      "schedule": "* * * * *"
+      "schedule": "5 10 * * *"
     }
   ]
 }
