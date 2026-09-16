@@ -19,7 +19,9 @@ const propertyValidationRules = () => {
 
 const packageValidationRules = () => {
   return [
-    body("title").notEmpty().withMessage("Shkuani titullin e pakëtes"),
+    body("title")
+      .notEmpty()
+      .withMessage("Shkuani titullin e pakëtetrio-travel/images"),
     body("destination").notEmpty().withMessage("Shkruani destinacionin"),
     body("price").notEmpty().withMessage("Vendosni cmimin e paketës"),
     body("duration").notEmpty().withMessage("Shkruani kohëzgjatjen"),

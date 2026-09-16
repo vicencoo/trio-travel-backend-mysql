@@ -18,13 +18,9 @@ exports.sendEmail = async (req, res) => {
         .json({ message: "Name, email and message are required" });
     }
 
-    console.log("Before checing");
-
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
       return res.status(500).json({ message: "Email credentials missing" });
     }
-
-    console.log("After checking");
 
     await transporter.sendMail({
       from: `"${name}" <${process.env.EMAIL_USER}>`,

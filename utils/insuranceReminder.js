@@ -63,7 +63,8 @@ const runInsuranceReminder = async () => {
     `;
 
   await sendEmail(
-    "triotravel.imobiliare@gmail.com",
+    // "triotravel.imobiliare@gmail.com",
+    "vicencollanaj2004@gmail.com",
     `Rikujtim: ${expiring.length} siguracione që skadojnë pas 7 ditësh`,
     htmlMessage,
   );

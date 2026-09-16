@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 async function sendEmail(to, subject, html, from = process.env.EMAIL_USER) {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-      console.log("Email credentials missing");
+      console.error("Email credentials missing");
       return;
     }
 
@@ -22,7 +22,7 @@ async function sendEmail(to, subject, html, from = process.env.EMAIL_USER) {
       html,
     });
   } catch (err) {
-    console.log("Email send failed:", err);
+    console.error("Email send failed:", err);
   }
 }
 
