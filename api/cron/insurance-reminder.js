@@ -5,6 +5,8 @@ module.exports = async (req, res) => {
     console.log("Insurance reminder started executing");
 
     await runInsuranceReminder();
+    console.log("Insurance reminder finished!!!");
+
     res.status(200).json({ message: "Reminder executed successfully" });
   } catch (err) {
     console.error("CRON ERROR:", err.message);
