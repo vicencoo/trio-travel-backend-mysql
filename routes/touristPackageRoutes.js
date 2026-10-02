@@ -52,4 +52,9 @@ router.post(
 
 router.get("/turkey-packages", touristPackageController.getTurkeyPackages);
 
+router.get(
+  "/christmas-packages",
+  touristPackageController.getChristmasPackages,
+);
+
 module.exports = router;

@@ -227,6 +227,159 @@ exports.getTurkeyPackages = async (req, res) => {
   }
 };
 
+exports.getChristmasPackages = async (req, res) => {
+  try {
+    const {
+      packageLimit,
+      page = 1,
+      searchQuery,
+      status = "active",
+    } = req.query;
+
+    const DEFAULT_LIMIT = 20;
+
+    const search = searchQuery?.trim().toLowerCase();
+
+    const christmasKeywords = [
+      // English
+      "christmas",
+      "xmas",
+      "x-mas",
+      "x mas",
+      "chrismas", // common misspelling
+      "christmass", // common misspelling
+      "santa",
+      "santa claus",
+      "lapland", // Santa trips
+      "rovaniemi", // Santa Claus Village
+      "advent",
+      "new year",
+      "newyear",
+      "new years",
+      "new year's",
+      "nye",
+      "countdown",
+      "festive",
+      "holiday season",
+      "winter holiday",
+      "winter break",
+      "winter wonderland",
+
+      // English months
+      "november",
+      "december",
+      "january",
+      "february",
+
+      // Albanian (roots catch all endings)
+      "krishtlindj", // krishtlindje, krishtlindjet, krishtlindjeve...
+      "krishtëlindj", // spelling variant
+      "kristlindj", // typo variant
+      "babadimr", // babadimri, babagjyshi i dimrit
+      "babagjysh",
+      "viti i ri",
+      "vitin e ri",
+      "vitit te ri",
+      "vitit të ri",
+      "vit i ri",
+      "fundvit", // fundviti, fundvitit
+      "fund viti",
+      "fundi i vitit",
+      "festat e fundvitit",
+      "festat e fundit te vitit",
+      "festat e dimrit",
+      "pushimet e dimrit",
+      "pushime dimri",
+      "tregu i krishtlindjeve",
+      "tregjet e krishtlindjeve",
+      "panair krishtlindj",
+      "ndërrimi i viteve",
+      "nderrimi i viteve",
+
+      // Albanian months (roots catch definite forms: nëntori, dhjetorit, janarin...)
+      "nëntor",
+      "nentor",
+      "dhjetor",
+      "janar",
+      "shkurt",
+    ];
+
+    let whereCondition = {
+      [Op.or]: christmasKeywords.flatMap((keyword) => [
+        { title: { [Op.like]: `%${keyword}%` } },
+        { destination: { [Op.like]: `%${keyword}%` } },
+        { description: { [Op.like]: `%${keyword}%` } },
+      ]),
+    };
+
+    if (search) {
+      whereCondition = {
+        [Op.and]: [
+          whereCondition,
+          {
+            [Op.or]: [
+              { title: { [Op.like]: `%${search}%` } },
+              { destination: { [Op.like]: `%${search}%` } },
+              { description: { [Op.like]: `%${search}%` } },
+            ],
+          },
+        ],
+      };
+    }
+
+    if (status && status !== "all") {
+      whereCondition = {
+        [Op.and]: [whereCondition, { status }],
+      };
+    }
+
+    const itemsPerPage = Math.min(
+      Number(packageLimit) || DEFAULT_LIMIT,
+      DEFAULT_LIMIT,
+    );
+
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const skip = (currentPage - 1) * itemsPerPage;
+
+    const { rows: packages, count: totalCount } = await Package.findAndCountAll(
+      {
+        where: whereCondition,
+        limit: itemsPerPage,
+        offset: skip,
+        include: [
+          {
+            model: PackageImage,
+            as: "package_images",
+            attributes: ["id", "image"],
+          },
+        ],
+        order: [
+          ["publishedAt", "DESC"],
+          [{ model: PackageImage, as: "package_images" }, "id", "ASC"],
+        ],
+        distinct: true,
+      },
+    );
+
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+    res.json({
+      packages,
+      pagination: {
+        totalPages,
+        totalPackages: totalCount,
+        currentPage,
+        itemsPerPage,
+      },
+    });
+  } catch (err) {
+    console.error("Getting Christmas packages error", err);
+    res.status(400).json({
+      message: "Error while getting Christmas packages",
+    });
+  }
+};
+
 exports.getPackage = async (req, res) => {
   try {
     const { packageId } = req.query;
