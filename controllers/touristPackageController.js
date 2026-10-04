@@ -53,9 +53,9 @@ exports.getPackages = async (req, res) => {
     if (search) {
       whereCondition = {
         [Op.or]: [
-          { title: { [Op.like]: `%${search}%` } },
-          { destination: { [Op.like]: `%${search}%` } },
-          { description: { [Op.like]: `%${search}%` } },
+          { title: { [Op.iLike]: `%${search}%` } },
+          { destination: { [Op.iLike]: `%${search}%` } },
+          { description: { [Op.iLike]: `%${search}%` } },
         ],
       };
     }
@@ -153,9 +153,9 @@ exports.getTurkeyPackages = async (req, res) => {
 
     let whereCondition = {
       [Op.or]: turkeyKeywords.flatMap((keyword) => [
-        { title: { [Op.like]: `%${keyword}%` } },
-        { destination: { [Op.like]: `%${keyword}%` } },
-        { description: { [Op.like]: `%${keyword}%` } },
+        { title: { [Op.iLike]: `%${keyword}%` } },
+        { destination: { [Op.iLike]: `%${keyword}%` } },
+        { description: { [Op.iLike]: `%${keyword}%` } },
       ]),
     };
 
@@ -165,9 +165,9 @@ exports.getTurkeyPackages = async (req, res) => {
           whereCondition,
           {
             [Op.or]: [
-              { title: { [Op.like]: `%${search}%` } },
-              { destination: { [Op.like]: `%${search}%` } },
-              { description: { [Op.like]: `%${search}%` } },
+              { title: { [Op.iLike]: `%${search}%` } },
+              { destination: { [Op.iLike]: `%${search}%` } },
+              { description: { [Op.iLike]: `%${search}%` } },
             ],
           },
         ],
@@ -266,7 +266,6 @@ exports.getChristmasPackages = async (req, res) => {
       "winter wonderland",
 
       // English months
-      "november",
       "december",
       "january",
       "february",
@@ -296,9 +295,7 @@ exports.getChristmasPackages = async (req, res) => {
       "ndërrimi i viteve",
       "nderrimi i viteve",
 
-      // Albanian months (roots catch definite forms: nëntori, dhjetorit, janarin...)
-      "nëntor",
-      "nentor",
+      // Albanian months (roots catch definite forms: dhjetorit, janarin...)
       "dhjetor",
       "janar",
       "shkurt",
@@ -306,9 +303,9 @@ exports.getChristmasPackages = async (req, res) => {
 
     let whereCondition = {
       [Op.or]: christmasKeywords.flatMap((keyword) => [
-        { title: { [Op.like]: `%${keyword}%` } },
-        { destination: { [Op.like]: `%${keyword}%` } },
-        { description: { [Op.like]: `%${keyword}%` } },
+        { title: { [Op.iLike]: `%${keyword}%` } },
+        { destination: { [Op.iLike]: `%${keyword}%` } },
+        { description: { [Op.iLike]: `%${keyword}%` } },
       ]),
     };
 
@@ -318,9 +315,9 @@ exports.getChristmasPackages = async (req, res) => {
           whereCondition,
           {
             [Op.or]: [
-              { title: { [Op.like]: `%${search}%` } },
-              { destination: { [Op.like]: `%${search}%` } },
-              { description: { [Op.like]: `%${search}%` } },
+              { title: { [Op.iLike]: `%${search}%` } },
+              { destination: { [Op.iLike]: `%${search}%` } },
+              { description: { [Op.iLike]: `%${search}%` } },
             ],
           },
         ],
@@ -376,6 +373,138 @@ exports.getChristmasPackages = async (req, res) => {
     console.error("Getting Christmas packages error", err);
     res.status(400).json({
       message: "Error while getting Christmas packages",
+    });
+  }
+};
+
+exports.getNovemberPackages = async (req, res) => {
+  try {
+    const {
+      packageLimit,
+      page = 1,
+      searchQuery,
+      status = "active",
+    } = req.query;
+
+    const DEFAULT_LIMIT = 20;
+
+    const search = searchQuery?.trim().toLowerCase();
+
+    const novemberKeywords = [
+      // Albanian November holidays (28 & 29 Nëntori)
+      "festat e nëntorit",
+      "festat e nentorit",
+      "festa e nentorit",
+      "28 nëntor",
+      "28 nentor",
+      "29 nëntor",
+      "29 nentor",
+      "dita e flamurit",
+      "dita e pavarësisë",
+      "dita e pavaresise",
+      "pavarësi", // pavarësia, pavarësisë...
+      "pavaresi",
+      "dita e çlirimit",
+      "dita e clirimit",
+      "çlirim", // çlirimi, çlirimit...
+      "clirim",
+      "fundjavë e gjatë",
+      "fundjave e gjate",
+
+      // English
+      "november",
+      "independence day",
+      "flag day",
+      "liberation day",
+      "long weekend",
+      "autumn",
+      "fall break",
+
+      // October packages
+      "october",
+      "autumn break",
+
+      // Albanian months (roots catch definite forms: nëntori, tetorit...)
+      "nëntor",
+      "nentor",
+      "tetor",
+      "vjeshtë", // vjeshta, vjeshtës...
+      "vjeshte",
+      "vjesht",
+    ];
+
+    let whereCondition = {
+      [Op.or]: novemberKeywords.flatMap((keyword) => [
+        { title: { [Op.iLike]: `%${keyword}%` } },
+        { destination: { [Op.iLike]: `%${keyword}%` } },
+        { description: { [Op.iLike]: `%${keyword}%` } },
+      ]),
+    };
+
+    if (search) {
+      whereCondition = {
+        [Op.and]: [
+          whereCondition,
+          {
+            [Op.or]: [
+              { title: { [Op.iLike]: `%${search}%` } },
+              { destination: { [Op.iLike]: `%${search}%` } },
+              { description: { [Op.iLike]: `%${search}%` } },
+            ],
+          },
+        ],
+      };
+    }
+
+    if (status && status !== "all") {
+      whereCondition = {
+        [Op.and]: [whereCondition, { status }],
+      };
+    }
+
+    const itemsPerPage = Math.min(
+      Number(packageLimit) || DEFAULT_LIMIT,
+      DEFAULT_LIMIT,
+    );
+
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const skip = (currentPage - 1) * itemsPerPage;
+
+    const { rows: packages, count: totalCount } = await Package.findAndCountAll(
+      {
+        where: whereCondition,
+        limit: itemsPerPage,
+        offset: skip,
+        include: [
+          {
+            model: PackageImage,
+            as: "package_images",
+            attributes: ["id", "image"],
+          },
+        ],
+        order: [
+          ["publishedAt", "DESC"],
+          [{ model: PackageImage, as: "package_images" }, "id", "ASC"],
+        ],
+        distinct: true,
+      },
+    );
+
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+    res.json({
+      packages,
+      pagination: {
+        totalPages,
+        totalPackages: totalCount,
+        currentPage,
+        itemsPerPage,
+      },
+    });
+  } catch (err) {
+    console.error("Getting November packages error", err);
+    res.status(400).json({
+      message: "Error while getting November packages",
     });
   }
 };

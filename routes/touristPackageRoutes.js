@@ -57,4 +57,9 @@ router.get(
   touristPackageController.getChristmasPackages,
 );
 
+router.get(
+  "/november-packages",
+  touristPackageController.getNovemberPackages,
+);
+
 module.exports = router;
