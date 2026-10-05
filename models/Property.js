@@ -39,6 +39,11 @@ const Property = sequelize.define(
       allowNull: false,
       defaultValue: 'available',
     },
+    currency: {
+      type: Sequelize.ENUM('EUR', 'ALL'),
+      allowNull: false,
+      defaultValue: 'EUR',
+    },
   },
   {
     tableName: 'properties',

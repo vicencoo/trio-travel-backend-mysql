@@ -13,6 +13,10 @@ const propertyValidationRules = () => {
       .withMessage("Vendosni cmimin e pronës")
       .isNumeric()
       .withMessage("Çmimi duhet të jetë një numër i vlefshëm"),
+    body("currency")
+      .optional()
+      .isIn(["EUR", "ALL"])
+      .withMessage("Zgjidhni monedhën: Euro ose Lek"),
     body("space").notEmpty().withMessage("Shkruani hapësirën e pronës"),
   ];
 };

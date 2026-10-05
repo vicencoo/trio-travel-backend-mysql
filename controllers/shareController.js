@@ -28,7 +28,11 @@ exports.shareProperty = async (req, res) => {
     return res.send(
       renderShareHtml({
         title: property.title,
-        description: `${property.city}, Shqipëri - ${property.price}€`,
+        description: `${property.city}, Shqipëri - ${
+          property.currency === "ALL"
+            ? `${property.price} Lekë`
+            : `${property.price}€`
+        }`,
         image: firstImage,
         url: frontendUrl,
       }),
